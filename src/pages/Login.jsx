@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import "../assets/scss/login.scss";
 import {login} from "../services/userService";
 import {FaEnvelope, FaLock} from "react-icons/fa"
+import { useNavigate } from "react-router-dom";
 
 const Login = () =>{
+    const navigate = useNavigate();
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [err, setErr] = useState("")
@@ -20,6 +22,7 @@ const Login = () =>{
             const {token, user} = res.data;
             localStorage.setItem("token", token);
             setErr("");
+            navigate("/")
         }
         catch(err){
             setErr(err.response?.data?.message || "Lỗi không xác định");
@@ -42,23 +45,23 @@ const Login = () =>{
                         {err && <p className="error">{err}</p>}
 
                         <div className="input-wrapper">
-                        <FaEnvelope className="icon" />
-                        <input
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
+                            <FaEnvelope className="icon" />
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                         </div>
 
                         <div className="input-wrapper">
-                        <FaLock className="icon" />
-                        <input
-                            type="password"
-                            placeholder="Mật khẩu"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
+                            <FaLock className="icon" />
+                            <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
                         </div>
 
                         <button type="submit" className="login-button">
