@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import "../assets/scss/header.scss";
 import { FaBell, FaUserCircle, FaFacebookF, FaInstagram, FaSearch, FaShoppingCart, FaTiktok } from "react-icons/fa";
+import {IoSettings ,IoLogOutOutline } from "react-icons/io5"
 import { useNavigate } from "react-router-dom";
 
 const Header = () => {
@@ -55,8 +56,12 @@ const Header = () => {
                     <FaShoppingCart /> Giỏ hàng
                   </a>
                 )}
-                <a href="#">Cập nhật thông tin</a>
-                <a href="#" onClick={handleLogout}>Đăng xuất</a>
+                <a href="/updateProfile">
+                <IoSettings />Cài đặt
+                </a>
+                <a href="#" onClick={handleLogout}>
+                <IoLogOutOutline />  Đăng xuất
+                </a>
               </>
             ) : (
               <>
