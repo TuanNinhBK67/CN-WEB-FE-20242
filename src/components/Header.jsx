@@ -1,8 +1,26 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import "../assets/scss/header.scss";
-import { FaBell, FaQuestionCircle, FaFacebookF, FaInstagram, FaSearch, FaShoppingCart, FaTiktok } from "react-icons/fa";
+import { FaBell, FaUserCircle, FaFacebookF, FaInstagram, FaSearch, FaShoppingCart, FaTiktok } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const [user, setUser] = useState(null);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if(storedUser){
+      setUser(JSON.parse(storedUser))
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/");
+  }
+
   return (
     <header className="shop-header">
       <div className="shop-header__topbar">
@@ -23,15 +41,43 @@ const Header = () => {
           
         </div>
         <div className="shop-header__right-links">
-          <a href="#"><FaBell /> Thông Báo</a>
-          <a href="#">Đăng Ký</a>
+          {
+            user ? (
+              <>
+                <span>
+                  <FaUserCircle /> Xin chào {user.username}
+                </span>
+                {user.role === "admin" && (
+                  <a href="/admin/dashboard">Quản lý</a>
+                )}
+                {user.role === "customer" && (
+                  <a href="/cart">
+                    <FaShoppingCart /> Giỏ hàng
+                  </a>
+                )}
+                <a href="#">Cập nhật thông tin</a>
+                <a href="#" onClick={handleLogout}>Đăng xuất</a>
+              </>
+            ) : (
+              <>
+                <a href="/notification"><FaBell /> Thông Báo</a>
+                <a href="/register">Đăng Ký</a>
+                <span>|</span>
+                <a href="/login">Đăng Nhập</a> 
+              </>
+            )
+          }
+          {/* <a href="#"><FaBell /> Thông Báo</a>
+          <a href="/register">Đăng Ký</a>
           <span>|</span>
-          <a href="#">Đăng Nhập</a>
+          <a href="/login">Đăng Nhập</a> */}
         </div>
       </div>
       <div className="shop-header__main">
         <div className="shop-logo">
+          <a href="/">
           <img src="/images/logo.png" alt="LogoWeb" />
+          </a>
         </div>
         <div className="shop-search">
           <input type="text" placeholder="Tìm kiếm sản phẩm bạn cần" />

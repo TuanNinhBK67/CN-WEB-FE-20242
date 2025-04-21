@@ -21,6 +21,7 @@ const Login = () =>{
             const res = await login(email, password);
             const {token, user} = res.data;
             localStorage.setItem("token", token);
+            localStorage.setItem("user", JSON.stringify(user));
             setErr("");
             navigate("/")
         }
