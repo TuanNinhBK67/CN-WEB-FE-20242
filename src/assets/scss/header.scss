@@ -1,0 +1,87 @@
+.shop-header {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+  
+    a {
+      color: white;
+      text-decoration: none;
+  
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  
+    .icon {
+      margin-left: 6px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+  
+    &__topbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 150px;
+      font-size: 13px;
+    }
+  
+    &__left-links,
+    &__right-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+  
+      span {
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+  
+    &__main {
+      display: flex;
+      align-items: center;
+      padding: 12px 150px;
+      gap: 20px;
+    }
+  
+    .shop-logo img {
+      height: 40px;
+    }
+  
+    .shop-search {
+      flex: 1;
+      display: flex;
+  
+      input {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        font-size: 14px;
+      }
+  
+      .search-button {
+        background: white;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        padding: 0 16px;
+        cursor: pointer;
+        color: #2575fc;
+      }
+    }
+  
+    .shop-cart {
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+  
+    &__keywords {
+      display: flex;
+      gap: 12px;
+      padding: 4px 12px 12px;
+      font-size: 12.5px;
+      justify-self: center;
+    }
+  }
