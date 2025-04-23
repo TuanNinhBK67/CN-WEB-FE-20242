@@ -4,7 +4,9 @@ import {Routes, Route} from "react-router-dom";
 import Login from "./pages/Login.jsx"
 import HomePage from "./pages/HomePage.jsx"
 import Register from './pages/Register.jsx';
-import Updateprofile from "./pages/UpdateProfile.jsx";
+import SettingLayout from './pages/Setting.jsx';
+import SettingWelcome from './pages/setting/SettingWelcom.jsx';
+import Updateprofile from './pages/setting/UpdateProfile.jsx';
 
 function App() {
   return (
@@ -12,7 +14,11 @@ function App() {
       <Route path="/" element={<HomePage />}/>
       <Route path="/login" element={<Login/>}/>
       <Route path="/register" element={<Register/>}/>
-      <Route path="/updateProfile" element={<Updateprofile/>}/>
+      <Route path="/setting" element={<SettingLayout />}>
+        <Route index element={<SettingWelcome />} />
+        <Route path="updateProfile" element={<Updateprofile />} />
+        {/* <Route path="password" element={<ChangePassword />} /> */}
+      </Route>
       // others routes
     </Routes>
     // <div className="App">
