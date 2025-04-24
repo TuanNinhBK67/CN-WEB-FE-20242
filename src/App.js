@@ -7,6 +7,9 @@ import Register from './pages/Register.jsx';
 import SettingLayout from './pages/Setting.jsx';
 import SettingWelcome from './pages/setting/SettingWelcom.jsx';
 import Updateprofile from './pages/setting/UpdateProfile.jsx';
+import GetProfile from './pages/setting/Profile.jsx';
+import DashboardUser from './pages/setting/ManageUser.jsx';
+import Changepassword from './pages/setting/ChangePassword.jsx';
 
 function App() {
   return (
@@ -17,7 +20,9 @@ function App() {
       <Route path="/setting" element={<SettingLayout />}>
         <Route index element={<SettingWelcome />} />
         <Route path="updateProfile" element={<Updateprofile />} />
-        {/* <Route path="password" element={<ChangePassword />} /> */}
+        <Route path="profile" element={<GetProfile/>}/>
+        <Route path="dashboard/user" element={<DashboardUser/>}/>
+        <Route path="password" element={<Changepassword />} />
       </Route>
       // others routes
     </Routes>

@@ -19,7 +19,7 @@ const SidebarMenu = () => {
                 <li onClick={() => navigate("/setting/updateProfile")}>Cập nhật thông tin</li>
 
             {user?.role === "customer" && (
-                <li oncClick={() => navigate("#")}>Giỏ hàng</li>
+                <li onClick={() => navigate("/setting/shoppingCart")}>Giỏ hàng</li>
             )}
             {
                 user?.role === "admin" && (
@@ -29,7 +29,7 @@ const SidebarMenu = () => {
                     </>
                 )
             }
-            <li onClick={() => navigate("/setting/changpassword")} >Đổi mật khẩu</li>
+            <li onClick={() => navigate("/setting/password")} >Đổi mật khẩu</li>
             <li onClick={handleLogout}>Đăng xuất</li>
             </ul>
         </div>
