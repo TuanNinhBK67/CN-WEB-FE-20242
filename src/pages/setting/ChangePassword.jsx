@@ -30,11 +30,8 @@ const Changepassword = () => {
                 localStorage.removeItem("user");
                 navigate("/login");
             }
-            else{
-                setErr(res.data.errMessage);
-            }
-        }catch(e){
-            setErr("Có lỗi xảy ra, vui lòng thử lại")
+        }catch(err){
+            setErr(err.response?.data?.errMessage || "Có lỗi xảy ra, vui lòng thử lại")
         }
     }
 

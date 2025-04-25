@@ -60,6 +60,15 @@ export const banUser = async(userId) => {
     });
 }
 
+export const unbanUser = async(userId) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API_URL}/unpunish/${userId}`, {}, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
+
 export const changePassword = async({oldPW, newPW, confirmPW}) => {
     const token = localStorage.getItem("token");
     return axios.post(`${API_URL}/changePassword`,{
@@ -70,5 +79,16 @@ export const changePassword = async({oldPW, newPW, confirmPW}) => {
         headers: {
             Authorization: `Bearer ${token}`
         }
+    })
+}
+
+export const forgotPassword = async(email) => {
+    return axios.post(`${API_URL}/forgot-password`, {email});
+}
+
+export const resetPassword = async(token, newPassword) => {
+    return axios.post(`${API_URL}/reset-password`, {
+        token, 
+        newPassword
     })
 }

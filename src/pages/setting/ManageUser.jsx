@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getAllUsers, banUser, deleteUser } from "../../services/userService";
+import { getAllUsers, banUser, deleteUser, unbanUser } from "../../services/userService";
 import "../../assets/scss/setting/ManageUser.scss";
 import { LuUserCheck, LuUserX , LuUsers  } from "react-icons/lu";
 
@@ -37,6 +37,16 @@ const UserManagement = () => {
         alert("Chặn người dùng thất bại.");
     }
   };
+
+  const handleUnBlock = async(userId) => {
+    try{
+      await unbanUser(userId);
+      alert("Đã gỡ chặn thành công");
+      window.location.reload();
+    }catch(error){
+      alert("Bỏ chặn thất bại.");
+    }
+  }
 
   const handleDelete = async(userId) => {
     try {
@@ -86,7 +96,7 @@ const UserManagement = () => {
               <td>{user.role === "admin" ? "Quản trị viên" : "Khách hàng"}</td>
               <td>{user.status === "banned" ? "Bị chặn" : "Hoạt động"}
                 {user.status === "banned" && (
-                    <button  className="unban">Bỏ Chặn</button>
+                    <button onClick={() => handleUnBlock(user.id)} className="unban">Bỏ Chặn</button>
                 )}
               </td>
               <td>
