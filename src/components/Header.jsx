@@ -48,18 +48,16 @@ const Header = () => {
                 <span>
                   <FaUserCircle /> Xin chào {user.username}
                 </span>
-                {user.role === "admin" && (
-                  <a href="/admin/dashboard">Quản lý</a>
-                )}
+                
                 {user.role === "customer" && (
                   <a href="/cart">
                     <FaShoppingCart /> Giỏ hàng
                   </a>
                 )}
-                <a href="/updateProfile">
+                <a href="/setting">
                 <IoSettings />Cài đặt
                 </a>
-                <a href="#" onClick={handleLogout}>
+                <a href="" onClick={handleLogout}>
                 <IoLogOutOutline />  Đăng xuất
                 </a>
               </>

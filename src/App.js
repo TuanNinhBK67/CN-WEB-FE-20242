@@ -4,7 +4,12 @@ import {Routes, Route} from "react-router-dom";
 import Login from "./pages/Login.jsx"
 import HomePage from "./pages/HomePage.jsx"
 import Register from './pages/Register.jsx';
-import Updateprofile from "./pages/UpdateProfile.jsx";
+import SettingLayout from './pages/Setting.jsx';
+import SettingWelcome from './pages/setting/SettingWelcom.jsx';
+import Updateprofile from './pages/setting/UpdateProfile.jsx';
+import GetProfile from './pages/setting/Profile.jsx';
+import DashboardUser from './pages/setting/ManageUser.jsx';
+import Changepassword from './pages/setting/ChangePassword.jsx';
 
 function App() {
   return (
@@ -12,7 +17,13 @@ function App() {
       <Route path="/" element={<HomePage />}/>
       <Route path="/login" element={<Login/>}/>
       <Route path="/register" element={<Register/>}/>
-      <Route path="/updateProfile" element={<Updateprofile/>}/>
+      <Route path="/setting" element={<SettingLayout />}>
+        <Route index element={<SettingWelcome />} />
+        <Route path="updateProfile" element={<Updateprofile />} />
+        <Route path="profile" element={<GetProfile/>}/>
+        <Route path="dashboard/user" element={<DashboardUser/>}/>
+        <Route path="password" element={<Changepassword />} />
+      </Route>
       // others routes
     </Routes>
     // <div className="App">

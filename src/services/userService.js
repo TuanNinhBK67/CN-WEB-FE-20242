@@ -21,3 +21,54 @@ export const updateInfor = async(data) => {
         },
     });
 };
+
+export const getProfile = async() => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API_URL}/getProfile`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}
+
+export const getAllUsers = async() => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API_URL}/getAllUser`,{
+        headers: {
+            Authorization: `Bearer ${token}`,
+        }
+    })
+}
+
+export const deleteUser = async(userId) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API_URL}/userDelete/${userId}`, {}, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
+
+export const banUser = async(userId) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API_URL}/punish/${userId}`, {}, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+}
+
+export const changePassword = async({oldPW, newPW, confirmPW}) => {
+    const token = localStorage.getItem("token");
+    return axios.post(`${API_URL}/changePassword`,{
+        oldPW,
+        newPW,
+        confirmPW
+    }, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}

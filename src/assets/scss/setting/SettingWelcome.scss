@@ -1,0 +1,29 @@
+.main-content {
+    padding: 40px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    flex: 1;
+  
+    h2 {
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 12px;
+    }
+  
+    p {
+      color: #555;
+    }
+  
+    ul {
+      margin-top: 10px;
+      padding-left: 20px;
+  
+      li {
+        margin-bottom: 6px;
+        color: #444;
+      }
+    }
+  }
+  

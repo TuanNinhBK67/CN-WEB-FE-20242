@@ -15,20 +15,21 @@ const SidebarMenu = () => {
     return(
         <div className="sidebar-menu">
             <ul>
-                <li onClick={() => navigate("/profile")}>Thông tin cá nhân</li>
-                <li onClick={() => navigate("/updateProfile")}>Cập nhật thông tin</li>
+                <li onClick={() => navigate("/setting/profile")}>Thông tin cá nhân</li>
+                <li onClick={() => navigate("/setting/updateProfile")}>Cập nhật thông tin</li>
 
             {user?.role === "customer" && (
-                <li oncClick={() => navigate("#")}>Giỏ hàng</li>
+                <li onClick={() => navigate("/setting/shoppingCart")}>Giỏ hàng</li>
             )}
             {
                 user?.role === "admin" && (
                     <>
-                        <li onClick={() => navigate("#")}>Quản lý người dùng</li>
-                        <li oncClick={() => navigate("#")}>Quản lý sản phẩm</li>
+                        <li onClick={() => navigate("/setting/dashboard/user")}>Quản lý người dùng</li>
+                        <li onClick={() => navigate("/setting/dashboard/product")}>Quản lý sản phẩm</li>
                     </>
                 )
             }
+            <li onClick={() => navigate("/setting/password")} >Đổi mật khẩu</li>
             <li onClick={handleLogout}>Đăng xuất</li>
             </ul>
         </div>
