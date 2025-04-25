@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../assets/scss/HomePage.scss";
+import "../assets/scss/ProductResults.scss";
 import { handleSearch } from "../services/SearchService";
 
-const HomePage = () => {
+const ProductResults = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const product = location.state;
+
   const [searchResults, setSearchResults] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const navigate = useNavigate();
 
   const onSearch = (keyword) => {
     handleSearch(keyword, setSearchKeyword, setSearchResults);
@@ -21,7 +24,7 @@ const HomePage = () => {
   return (
     <>
       <Header onSearch={onSearch} />
-      <main className="homepage">
+      <main className="product-details">
         {searchKeyword ? (
           <>
             <h1>Kết quả tìm kiếm cho "{searchKeyword}"</h1>
@@ -60,7 +63,29 @@ const HomePage = () => {
             )}
           </>
         ) : (
-          <h1>This is homepage</h1>
+          <div className="product-details-container">
+            <div className="product-image-section">
+              <img
+                src={product.image_url || "https://via.placeholder.com/150"}
+                alt={product.name}
+                className="product-image"
+              />
+            </div>
+            <div className="product-info-section">
+              <h1 className="product-title">{product.name}</h1>
+              <p className="product-price">
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(product.price)}
+              </p>
+              <p className="product-description">{product.description}</p>
+              <div className="product-actions">
+                <button className="add-to-cart-button">Add to cart</button>
+                <button className="buy-now-button">Buy now</button>
+              </div>
+            </div>
+          </div>
         )}
       </main>
       <Footer />
@@ -68,4 +93,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default ProductResults;
