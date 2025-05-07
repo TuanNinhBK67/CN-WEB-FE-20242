@@ -1,10 +1,10 @@
 import logo from './logo.svg';
 import './App.scss';
 import {Routes, Route} from "react-router-dom";
-import Login from "./pages/Login.jsx"
+import Login from "./pages/user/Login.jsx"
 import HomePage from "./pages/HomePage.jsx"
-import Register from './pages/Register.jsx';
-import SettingLayout from './pages/Setting.jsx';
+import Register from './pages/user/Register.jsx';
+import SettingLayout from './pages/user/Setting.jsx';
 import SettingWelcome from './pages/setting/SettingWelcom.jsx';
 import Updateprofile from './pages/setting/UpdateProfile.jsx';
 import GetProfile from './pages/setting/Profile.jsx';
@@ -12,8 +12,8 @@ import DashboardUser from './pages/setting/ManageUser.jsx';
 import Changepassword from './pages/setting/ChangePassword.jsx';
 import RequireGuest from './components/RequireGuest.jsx';
 import RequireAuth from './components/RequireAuth.jsx';
-import ForgotPassword from './pages/ForgotPassword.jsx';
-import ResetPassword from './pages/ResetPassword.jsx';
+import ForgotPassword from './pages/user/ForgotPassword.jsx';
+import ResetPassword from './pages/user/ResetPassword.jsx';
 
 function App() {
   return (

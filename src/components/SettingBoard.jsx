@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../assets/scss/SettingBoard.scss";
+import "../assets/scss/user/SettingBoard.scss";
 
 const SidebarMenu = () => {
     const navigate = useNavigate();
