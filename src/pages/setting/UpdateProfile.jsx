@@ -97,7 +97,7 @@ const Updateprofile = () => {
                 phone_number: user.phone_number || "",
             });
         }
-    }, []);
+    }, [provinces]);
 
     const handleProvinceChange = (e) => {
         const provinceName = e.target.value;
@@ -147,6 +147,11 @@ const Updateprofile = () => {
         const phoneRegex = /^\d{10}$/;
         if(!phoneRegex.test(formData.phone_number)){
             setErr("Số điện thoại không chính xác");
+            return;
+        }
+
+        if(!addressDetail || !selectedWard || !selectedDistrict || !selectedProvince){
+            setErr("Yêu cầu nhập đầy đủ địa chỉ");
             return;
         }
         
@@ -200,7 +205,7 @@ const Updateprofile = () => {
 
                         <label htmlFor="province">Tỉnh/Thành Phố:</label>
                         <select 
-                            className="address-select" 
+                            className="address" 
                             value={selectedProvince} 
                             onChange={handleProvinceChange}
                         >
@@ -214,7 +219,7 @@ const Updateprofile = () => {
 
                         <label htmlFor="district">Quận/Huyện:</label>
                         <select
-                            className="address-select"
+                            className="address"
                             value={selectedDistrict}
                             onChange={handleDistrictChange}
                             disabled={!districts.length}
@@ -229,7 +234,7 @@ const Updateprofile = () => {
 
                         <label htmlFor="ward">Phường/Xã:</label>
                         <select
-                            className="address-select"
+                            className="address"
                             value={selectedWard}
                             onChange={(e) => setSelectedWard(e.target.value)}
                             disabled={!wards.length}
