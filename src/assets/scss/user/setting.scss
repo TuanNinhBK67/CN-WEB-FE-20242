@@ -1,0 +1,41 @@
+.setting-layout {
+    display: flex;
+    align-items: flex-start;
+    min-height: 80vh;
+    background: linear-gradient(to right, #2575fc, #2575fc);
+    padding: 40px;
+  
+    .sidebar-menu {
+      width: 240px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      margin-right: 32px;
+      flex-shrink: 0;
+      height: fit-content;
+      position: sticky;
+      top: 120px;
+    }
+  
+    .setting-content {
+      flex: 1;
+      background: linear-gradient(to right, #a8edea, #fed6e3);
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.05);
+      min-height: 500px;
+  
+      h2 {
+        font-size: 22px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 16px;
+      }
+  
+      p {
+        color: #666;
+      }
+    }
+  }
+  

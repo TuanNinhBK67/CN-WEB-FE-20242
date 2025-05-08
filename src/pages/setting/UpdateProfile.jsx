@@ -1,7 +1,26 @@
 import React, {useEffect, useState} from "react";
 import { updateInfor } from "../../services/userService";
 import { useNavigate } from "react-router-dom";
-import "../../assets/scss/setting/updateProfile.scss"
+import "../../assets/scss/setting/updateProfile.scss";
+import addressAPI from "../../vietnam-provinces.json";
+
+const parseAddressSmart = (addressString) => {
+    const parts = addressString.split(",").map(p => p.trim());
+
+    const total = parts.length;
+
+    const province = parts[total - 1];
+    const district = parts[total - 2];
+    const ward = parts[total - 3];
+
+    const detail = parts.slice(0, total - 3).join(",");
+    return[
+        detail, 
+        ward, 
+        district,
+        province
+    ];
+}
 
 const Updateprofile = () => {
     const [formData, setFormData] = useState({
@@ -12,22 +31,107 @@ const Updateprofile = () => {
         phone_number:"",
     });
 
+    // let addressInfo = "";
+
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [wards, setWards] = useState([]);
+    
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
+    
+    const [addressDetail, setAddressDetail] = useState("");
+
     const navigate = useNavigate()
     const [err, setErr] = useState("");
+
+    useEffect(()=> {
+        const provinceArray = Object.entries(addressAPI).map(([provinceCode, provinceData]) =>({
+            name: provinceData.name,
+            code: provinceCode,
+            districts: Object.entries(provinceData["quan-huyen"]).map(([districtCode, districtData]) => ({
+                name: districtData.name,
+                code: districtCode,
+                wards: Object.entries(districtData["xa-phuong"]).map(([wardCode, wardData]) => ({
+                    name: wardData.name,
+                    code: wardCode,
+                }))
+            }))
+        }))
+        setProvinces(provinceArray);
+    }, []);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if(storedUser){
             const user = JSON.parse(storedUser);
+            //addressInfo = parseAddressSmart(user.address);
+            const [detail, ward, district, province] = parseAddressSmart(user.address);
+
+            setSelectedProvince(province || "");
+            setSelectedDistrict(district || "");
+            setSelectedWard(ward || "");
+            if (province) {
+                setSelectedProvince(province);
+                const foundProvince = provinces.find((p) => p.name === province);
+                if (foundProvince) {
+                    setDistricts(foundProvince.districts);
+    
+                    if (district) {
+                        setSelectedDistrict(district);
+                        const foundDistrict = foundProvince.districts.find((d) => d.name === district);
+                        if (foundDistrict) {
+                            setWards(foundDistrict.wards);
+                            setSelectedWard(ward || "");
+                        }
+                    }
+                }
+            }
+            setAddressDetail(detail || "");
+
             setFormData({
                 username: user.username || "",
                 full_name: user.full_name || "",
                 gender: user.gender || "",
-                address: user.address || "",
                 phone_number: user.phone_number || "",
             });
         }
     }, []);
+
+    const handleProvinceChange = (e) => {
+        const provinceName = e.target.value;
+        setSelectedProvince(provinceName);
+        setSelectedDistrict("");
+        setSelectedWard("");
+        setWards([]);
+  
+        const province = provinces.find((p) => p.name === provinceName);
+        if(province){
+          setDistricts(province.districts);
+        }
+        else{
+          setDistricts([]);
+        }
+    }
+
+    const handleDistrictChange = (e) => {
+        const districtName = e.target.value;
+        setSelectedDistrict(districtName);
+        setSelectedWard("");
+  
+        const province = provinces.find((p) => p.name === selectedProvince);
+  
+        if(province){
+            const district = province.districts.find((d) => d.name === districtName);
+            if(district){
+                setWards(district.wards);
+            }
+            else{
+                setWards([]);
+            }
+        }
+    }
 
     const handleChange = (e) => {
         const {name, value} = e.target;
@@ -45,8 +149,12 @@ const Updateprofile = () => {
             setErr("Số điện thoại không chính xác");
             return;
         }
+        
         try{
-            const res = await updateInfor(formData);
+            const fullAddress = `${addressDetail}, ${selectedWard}, ${selectedDistrict}, ${selectedProvince}`
+            const submitData = {...formData, address: fullAddress};
+
+            const res = await updateInfor(submitData);
             const {errCode, errMessage} = res.data;
             if(errCode === 0){
                 const stored = localStorage.getItem("user");
@@ -90,13 +198,57 @@ const Updateprofile = () => {
                             onChange={handleChange} 
                         />
 
+                        <label htmlFor="province">Tỉnh/Thành Phố:</label>
+                        <select 
+                            className="address-select" 
+                            value={selectedProvince} 
+                            onChange={handleProvinceChange}
+                        >
+                            <option value="">-- Chọn tỉnh/thành phố --</option>
+                            {provinces.map((province) => (
+                                <option key={province.code} value={province.name}>
+                                    {province.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <label htmlFor="district">Quận/Huyện:</label>
+                        <select
+                            className="address-select"
+                            value={selectedDistrict}
+                            onChange={handleDistrictChange}
+                            disabled={!districts.length}
+                        >
+                            <option value="">-- Chọn quận/huyện --</option>
+                            {districts.map((district) => (
+                                <option key={district.code} value={district.name}>
+                                    {district.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <label htmlFor="ward">Phường/Xã:</label>
+                        <select
+                            className="address-select"
+                            value={selectedWard}
+                            onChange={(e) => setSelectedWard(e.target.value)}
+                            disabled={!wards.length}
+                        >
+                            <option value="">-- Chọn phường/xã --</option>
+                            {wards.map((ward) => (
+                                <option key={ward.code} value={ward.name}>
+                                    {ward.name}
+                                </option>
+                            ))}
+                        </select>
+
                         <label htmlFor="address">Địa chỉ:</label>
                         <input
                             id="address"
                             type="text"
                             name="address"
-                            value={formData.address}
-                            onChange={handleChange} 
+                            value={addressDetail}
+                            onChange={(e) => setAddressDetail(e.target.value)} 
                         />
 
                         <label htmlFor="phone_number">Số điện thoại:</label>

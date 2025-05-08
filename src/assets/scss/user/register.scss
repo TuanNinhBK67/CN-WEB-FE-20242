@@ -1,0 +1,136 @@
+.register-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+  }
+  
+  .register-card {
+    background: white;
+    padding: 2rem 3rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .register-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    color: #333;
+  }
+  
+  .register-form {
+    display: flex;
+    flex-direction: column;
+  
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      margin-bottom: 1rem;
+      padding: 10px 12px;
+      border: 1px solid #4a90e2;
+      border-radius: 20px;
+      font-size: 1rem;
+    }
+  
+    .gender-radio {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+  
+      label {
+        font-size: 0.95rem;
+        input {
+          margin-right: 6px;
+        }
+      }
+    }
+  
+    button {
+      background-color: #6a11cb;
+      color: white;
+      font-weight: bold;
+      padding: 10px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+  
+      &:hover {
+        background-color: #5011b5;
+      }
+    }
+  
+    .error {
+      color: red;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  }
+  
+  .gender-radio {
+    margin-bottom: 1rem;
+  
+    .gender-title {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: #333;
+    }
+  
+    .gender-options {
+      display: flex;
+      justify-content: space-between;
+  
+      label {
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+  
+        input[type="radio"] {
+          transform: scale(1.1);
+          accent-color: #6a11cb;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+  
+.address-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background-color: #fff;
+  font-size: 1rem;
+  color: #333;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+  &:focus {
+      border-color: #4a90e2;
+      box-shadow: 0 0 5px rgba(74, 144, 226, 0.5);
+      outline: none;
+  }
+
+  &:disabled {
+      background-color: #f5f5f5;
+      color: #aaa;
+      cursor: not-allowed;
+  }
+}
+
+.address-select {
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
