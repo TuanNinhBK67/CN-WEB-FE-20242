@@ -1,15 +1,16 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import "../assets/scss/ProductResults.scss";
 import { handleSearch } from "../services/SearchService";
 
 const ProductResults = () => {
-  const location = useLocation();
+  const { id } = useParams(); // Lấy id từ URL
   const navigate = useNavigate();
-  const product = location.state;
+  const location = useLocation();
 
+  const [product, setProduct] = useState(null); // Lưu thông tin sản phẩm hiện tại
   const [searchResults, setSearchResults] = useState([]);
   const [searchKeyword, setSearchKeyword] = useState("");
 
@@ -20,6 +21,26 @@ const ProductResults = () => {
   const handleCardClick = (product) => {
     navigate(`/product/${product.id}`, { state: product });
   };
+
+  // Lấy thông tin sản phẩm khi id thay đổi
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/products/${id}`
+        );
+        if (!response.ok) {
+          throw new Error("Không thể tải thông tin sản phẩm");
+        }
+        const data = await response.json();
+        setProduct(data); // Cập nhật thông tin sản phẩm
+      } catch (error) {
+        console.error("Lỗi khi tải sản phẩm:", error);
+      }
+    };
+
+    fetchProduct();
+  }, [id]); // Chạy lại khi id trong URL thay đổi
 
   return (
     <>
@@ -62,7 +83,7 @@ const ProductResults = () => {
               <p>Không tìm thấy sản phẩm nào phù hợp.</p>
             )}
           </>
-        ) : (
+        ) : product ? (
           <div className="product-details-container">
             <div className="product-image-section">
               <img
@@ -86,6 +107,8 @@ const ProductResults = () => {
               </div>
             </div>
           </div>
+        ) : (
+          <p>Đang tải thông tin sản phẩm...</p>
         )}
       </main>
       <Footer />
