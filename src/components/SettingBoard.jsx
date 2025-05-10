@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../assets/scss/SettingBoard.scss";
+import "../assets/scss/user/SettingBoard.scss";
 
 const SidebarMenu = () => {
     const navigate = useNavigate();
@@ -26,9 +26,13 @@ const SidebarMenu = () => {
                     <>
                         <li onClick={() => navigate("/setting/dashboard/user")}>Quản lý người dùng</li>
                         <li onClick={() => navigate("/setting/dashboard/product")}>Quản lý sản phẩm</li>
+                        <li onClick={() => navigate("/setting/dashboard/order")}>Quản lý đơn hàng</li>
                     </>
                 )
             }
+            {user?.role === "shipper" && (
+                <li onClick={() => navigate("/setting/order")}>Danh sách đơn hàng</li>
+            )}
             <li onClick={() => navigate("/setting/password")} >Đổi mật khẩu</li>
             <li onClick={handleLogout}>Đăng xuất</li>
             </ul>
