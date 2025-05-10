@@ -4,6 +4,8 @@ import {useNavigate} from "react-router-dom";
 // import "../assets/scss/register.scss"
 import "../../assets/scss/user/register.scss"
 import addressAPI from "../../vietnam-provinces.json"
+import { LuShoppingCart } from "react-icons/lu";
+import { LiaShippingFastSolid } from "react-icons/lia";
 
 const RegisterAccount = () => {
 
@@ -14,6 +16,7 @@ const RegisterAccount = () => {
       gender:"",
       address:"",
       phone_number:"",
+      role: "",
       password:"",
       confirmPassword:"",
     });
@@ -259,6 +262,31 @@ const RegisterAccount = () => {
               value={formData.confirmPassword}
               onChange={handleChange} 
             />
+
+            {/* select your role */}
+            <div className="role-radio">
+              <label className="role-title">Sử dụng hệ thống với vai trò: </label>
+              <label>
+                <input
+                  type="radio"
+                  name="role"
+                  value="customer"
+                  checked={formData.role === "customer"}
+                  onChange={handleChange}
+                />
+                Khách Hàng<LuShoppingCart/>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="role"
+                  value="shipper"
+                  checked={formData.role === "shipper"}
+                  onChange={handleChange}
+                />
+                Người giao hàng <LiaShippingFastSolid/>
+              </label>
+            </div>
 
             <button type="submit">Đăng ký</button>
             <p style={{ textAlign: "center", marginTop: "1rem" }}>

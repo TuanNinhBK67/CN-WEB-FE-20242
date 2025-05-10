@@ -37,7 +37,7 @@ const GetProfile = () => {
                     <p><strong>Email:</strong> {user.email}</p>
                     <p><strong>Số điện thoại:</strong> {user.phone_number}</p>
                     <p><strong>Địa chỉ:</strong> {user.address}</p>
-                    <p><strong>Vai trò:</strong> {user.role === "admin" ? "Quản trị viên" : "Khách hàng"}</p>
+                    <p><strong>Vai trò:</strong> {user.role === "admin" ? "Quản trị viên" : user.role === "shipper" ? "Người giao hàng" : "Khách hàng"}</p>
                 </div>
             </div>
         </div>

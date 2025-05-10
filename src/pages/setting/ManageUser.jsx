@@ -93,7 +93,7 @@ const UserManagement = () => {
               <td>{user.email}</td>
               <td>{user.phone_number}</td>
               <td>{user.address}</td>
-              <td>{user.role === "admin" ? "Quản trị viên" : "Khách hàng"}</td>
+              <td>{user.role === "admin" ? "Quản trị viên" : user.role === "shipper" ? "Người giao hàng": "Khách hàng"}</td>
               <td>{user.status === "banned" ? "Bị chặn" : "Hoạt động"}
                 {user.status === "banned" && (
                     <button onClick={() => handleUnBlock(user.id)} className="unban">Bỏ Chặn</button>
