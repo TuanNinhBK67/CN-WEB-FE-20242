@@ -14,6 +14,8 @@ import RequireGuest from "./components/RequireGuest.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import ForgotPassword from "./pages/user/ForgotPassword.jsx";
 import ResetPassword from "./pages/user/ResetPassword.jsx";
+import ProductResults from "./pages/ProductResults"; // đường dẫn tùy bạn
+import ManageProduct from "./pages/setting/ManageProduct.jsx";
 
 function App() {
   return (
@@ -64,6 +66,7 @@ function App() {
         <Route path="profile" element={<GetProfile />} />
         <Route path="dashboard/user" element={<DashboardUser />} />
         <Route path="password" element={<Changepassword />} />
+        <Route path="dashboard/product" element={<ManageProduct />} />
       </Route>
       <Route path="/" element={<HomePage />} />
       <Route path="/product/:id" element={<ProductResults />} />
