@@ -18,6 +18,8 @@ import Checkout from './pages/Checkout.jsx';
 import PaymentSuccess from './pages/payment/PaymentSuccess.jsx';
 import PaymentFailed from './pages/payment/PaymentFailed.jsx';
 import PaymentHistory from './pages/setting/PaymentHistory.jsx';
+import ProductResults from './pages/ProductResults';
+import ManageProduct from './pages/setting/ManageProduct.jsx';
 
 function App() {
   return (
@@ -30,22 +32,7 @@ function App() {
             <Login />
           </RequireGuest>
         }
-      <Route path="/" element={<HomePage />} />
-      <Route
-        path="/login"
-        element={
-          <RequireGuest>
-            <Login />
-          </RequireGuest>
-        }
       />
-      <Route
-        path="/forgot-password"
-        element={
-          <RequireGuest>
-            <ForgotPassword />
-          </RequireGuest>
-        }
       <Route
         path="/forgot-password"
         element={
@@ -61,13 +48,6 @@ function App() {
             <ResetPassword />
           </RequireGuest>
         }
-      <Route
-        path="/reset-password"
-        element={
-          <RequireGuest>
-            <ResetPassword />
-          </RequireGuest>
-        }
       />
       <Route
         path="/register"
@@ -76,21 +56,7 @@ function App() {
             <Register />
           </RequireGuest>
         }
-      <Route
-        path="/register"
-        element={
-          <RequireGuest>
-            <Register />
-          </RequireGuest>
-        }
       />
-      <Route
-        path="/setting"
-        element={
-          <RequireAuth>
-            <SettingLayout />
-          </RequireAuth>
-        }
       <Route
         path="/setting"
         element={
@@ -103,8 +69,6 @@ function App() {
         <Route path="updateProfile" element={<Updateprofile />} />
         <Route path="profile" element={<GetProfile />} />
         <Route path="dashboard/user" element={<DashboardUser />} />
-        <Route path="profile" element={<GetProfile />} />
-        <Route path="dashboard/user" element={<DashboardUser />} />
         <Route path="password" element={<Changepassword />} />
         <Route path="payments" element={<PaymentHistory />} />
         <Route path="dashboard/product" element={<ManageProduct />} />
@@ -112,6 +76,7 @@ function App() {
       <Route path="/checkout/:orderId?" element={<Checkout />} />
       <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
       <Route path="/payment/failed/:orderId" element={<PaymentFailed />} />
+      <Route path="/product/:id" element={<ProductResults />} />
     </Routes>
   );
 }
