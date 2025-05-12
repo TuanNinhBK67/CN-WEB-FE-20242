@@ -30,7 +30,22 @@ function App() {
             <Login />
           </RequireGuest>
         }
+      <Route path="/" element={<HomePage />} />
+      <Route
+        path="/login"
+        element={
+          <RequireGuest>
+            <Login />
+          </RequireGuest>
+        }
       />
+      <Route
+        path="/forgot-password"
+        element={
+          <RequireGuest>
+            <ForgotPassword />
+          </RequireGuest>
+        }
       <Route
         path="/forgot-password"
         element={
@@ -46,7 +61,21 @@ function App() {
             <ResetPassword />
           </RequireGuest>
         }
+      <Route
+        path="/reset-password"
+        element={
+          <RequireGuest>
+            <ResetPassword />
+          </RequireGuest>
+        }
       />
+      <Route
+        path="/register"
+        element={
+          <RequireGuest>
+            <Register />
+          </RequireGuest>
+        }
       <Route
         path="/register"
         element={
@@ -62,13 +91,23 @@ function App() {
             <SettingLayout />
           </RequireAuth>
         }
+      <Route
+        path="/setting"
+        element={
+          <RequireAuth>
+            <SettingLayout />
+          </RequireAuth>
+        }
       >
         <Route index element={<SettingWelcome />} />
         <Route path="updateProfile" element={<Updateprofile />} />
         <Route path="profile" element={<GetProfile />} />
         <Route path="dashboard/user" element={<DashboardUser />} />
+        <Route path="profile" element={<GetProfile />} />
+        <Route path="dashboard/user" element={<DashboardUser />} />
         <Route path="password" element={<Changepassword />} />
         <Route path="payments" element={<PaymentHistory />} />
+        <Route path="dashboard/product" element={<ManageProduct />} />
       </Route>
       <Route path="/checkout/:orderId?" element={<Checkout />} />
       <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
