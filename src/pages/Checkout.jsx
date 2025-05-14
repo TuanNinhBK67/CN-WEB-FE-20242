@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { message } from "antd";
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import "./Checkout.scss";
@@ -57,12 +58,23 @@ const Checkout = () => {
 
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      
+
+      // Tạo giao dịch mới
+      const createResponse = await axios.post("/api/payments", {
+        order_id: order.id,
+        user_id: user.id,
+        amount: order.total,
+        payment_method: paymentMethod,
+      });
+      if (!createResponse.data.success) {
+        throw new Error("Không thể tạo giao dịch thanh toán");
+      }
+
+      // Xử lý thanh toán
       const response = await axios.post("/api/payments/process", {
         order_id: order.id,
         user_id: user.id,
         payment_method: paymentMethod,
-        amount: order.total,
       });
 
       if (response.data.success) {
@@ -71,8 +83,29 @@ const Checkout = () => {
         navigate(`/payment/failed/${order.id}`);
       }
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error("Lỗi thanh toán:", error);
+      message.error("Đã xảy ra lỗi khi xử lý thanh toán");
       navigate(`/payment/failed/${order.id}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancelPayment = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post("/api/payments/cancel", {
+        order_id: order.id,
+      });
+      if (response.data.success) {
+        message.success("Đã hủy thanh toán thành công");
+        navigate("/setting/orders");
+      } else {
+        message.error("Không thể hủy thanh toán");
+      }
+    } catch (error) {
+      console.error("Lỗi khi hủy thanh toán:", error);
+      message.error("Đã xảy ra lỗi khi hủy thanh toán");
     } finally {
       setLoading(false);
     }
@@ -155,7 +188,6 @@ const Checkout = () => {
                 }`}
                 onClick={() => handlePaymentMethodChange("momo")}
               >
-               
                 <span>MoMo</span>
               </div>
               <div
@@ -164,7 +196,6 @@ const Checkout = () => {
                 }`}
                 onClick={() => handlePaymentMethodChange("vnpay")}
               >
-                
                 <span>VnPay</span>
               </div>
               <div
@@ -230,13 +261,23 @@ const Checkout = () => {
                     />
                   </div>
                 </div>
-                <button 
-                  type="submit" 
-                  className="payment-button"
-                  disabled={loading}
-                >
-                  {loading ? "Đang xử lý..." : "Thanh toán ngay"}
-                </button>
+                <div className="action-buttons">
+                  <button 
+                    type="submit" 
+                    className="payment-button"
+                    disabled={loading}
+                  >
+                    {loading ? "Đang xử lý..." : "Thanh toán ngay"}
+                  </button>
+                  <button 
+                    type="button"
+                    className="secondary-button"
+                    onClick={handleCancelPayment}
+                    disabled={loading}
+                  >
+                    Hủy thanh toán
+                  </button>
+                </div>
               </form>
             )}
 
@@ -246,13 +287,23 @@ const Checkout = () => {
                   <img src="/api/placeholder/200/200" alt="QR Code" />
                   <p>Quét mã QR để thanh toán</p>
                 </div>
-                <button 
-                  onClick={handleSubmit} 
-                  className="payment-button"
-                  disabled={loading}
-                >
-                  {loading ? "Đang xử lý..." : "Xác nhận đã thanh toán"}
-                </button>
+                <div className="action-buttons">
+                  <button 
+                    onClick={handleSubmit} 
+                    className="payment-button"
+                    disabled={loading}
+                  >
+                    {loading ? "Đang xử lý..." : "Xác nhận đã thanh toán"}
+                  </button>
+                  <button 
+                    type="button"
+                    className="secondary-button"
+                    onClick={handleCancelPayment}
+                    disabled={loading}
+                  >
+                    Hủy thanh toán
+                  </button>
+                </div>
               </div>
             )}
           </div>
