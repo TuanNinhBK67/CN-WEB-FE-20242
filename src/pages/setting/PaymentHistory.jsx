@@ -17,6 +17,9 @@ const PaymentHistory = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [invoiceModalVisible, setInvoiceModalVisible] = useState(false);
   const [invoiceLoading, setInvoiceLoading] = useState(false);
+  const [refundReason, setRefundReason] = useState("");
+  const [showRefundModal, setShowRefundModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -31,7 +34,6 @@ const PaymentHistory = () => {
 
         const response = await axios.get("/api/payments");
         if (response.data.success) {
-          // Giả định API trả về cấu trúc tương tự Mã 2, ánh xạ sang định dạng của Mã 1
           const formattedPayments = response.data.payments.map((payment) => ({
             id: payment.id,
             orderId: payment.order?.id || "N/A",
@@ -86,6 +88,53 @@ const PaymentHistory = () => {
     } catch (error) {
       console.error("Lỗi khi kiểm tra trạng thái thanh toán:", error);
       message.error("Đã xảy ra lỗi khi kiểm tra trạng thái thanh toán");
+    }
+  };
+
+  const handleRequestRefund = async () => {
+    try {
+      const response = await axios.post("/api/payments/refund", {
+        order_id: selectedOrderId,
+        reason: refundReason,
+      });
+      if (response.data.success) {
+        message.success("Yêu cầu hoàn tiền đã được gửi");
+        setShowRefundModal(false);
+        setRefundReason("");
+        // Cập nhật danh sách thanh toán
+        const fetchPayments = async () => {
+          setLoading(true);
+          try {
+            const response = await axios.get("/api/payments");
+            if (response.data.success) {
+              const formattedPayments = response.data.payments.map((payment) => ({
+                id: payment.id,
+                orderId: payment.order?.id || "N/A",
+                transactionId: payment.transaction_id || "N/A",
+                date: payment.created_at,
+                amount: payment.amount,
+                paymentMethod: payment.payment_method,
+                status: payment.status.toLowerCase(),
+                invoiceId: payment.invoice_id || null,
+              }));
+              setPayments(formattedPayments);
+            } else {
+              message.error("Không thể tải lịch sử thanh toán");
+            }
+          } catch (error) {
+            console.error("Lỗi khi tải lịch sử thanh toán:", error);
+            message.error("Đã xảy ra lỗi khi tải lịch sử thanh toán");
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchPayments();
+      } else {
+        message.error("Không thể gửi yêu cầu hoàn tiền");
+      }
+    } catch (error) {
+      console.error("Lỗi khi yêu cầu hoàn tiền:", error);
+      message.error("Đã xảy ra lỗi khi gửi yêu cầu hoàn tiền");
     }
   };
 
@@ -201,17 +250,26 @@ const PaymentHistory = () => {
                           <td>{getPaymentMethodLabel(payment.paymentMethod)}</td>
                           <td>{getStatusLabel(payment.status)}</td>
                           <td>
-                            {payment.status === "successful" ||
-                            payment.status === "completed" ? (
-                              <button
-                                className="action-button view-invoice"
-                                onClick={() => viewInvoice(payment.invoiceId)}
-                                disabled={!payment.invoiceId}
-                              >
-                                <FaFileInvoice /> Xem hóa đơn
-                              </button>
-                            ) : payment.status === "failed" ||
-                              payment.status === "pending" ? (
+                            {(payment.status === "successful" || payment.status === "completed") ? (
+                              <>
+                                <button
+                                  className="action-button view-invoice"
+                                  onClick={() => viewInvoice(payment.invoiceId)}
+                                  disabled={!payment.invoiceId}
+                                >
+                                  <FaFileInvoice /> Xem hóa đơn
+                                </button>
+                                <button
+                                  className="action-button refund"
+                                  onClick={() => {
+                                    setSelectedOrderId(payment.orderId);
+                                    setShowRefundModal(true);
+                                  }}
+                                >
+                                  Yêu cầu hoàn tiền
+                                </button>
+                              </>
+                            ) : payment.status === "failed" || payment.status === "pending" ? (
                               <button
                                 className="action-button retry-payment"
                                 onClick={() => handleRetryPayment(payment.orderId)}
@@ -306,6 +364,38 @@ const PaymentHistory = () => {
         ) : (
           <p>Không có dữ liệu hóa đơn</p>
         )}
+      </Modal>
+
+      <Modal
+        title="Yêu cầu hoàn tiền"
+        open={showRefundModal}
+        onCancel={() => setShowRefundModal(false)}
+        footer={[
+          <button
+            key="cancel"
+            className="action-button"
+            onClick={() => setShowRefundModal(false)}
+          >
+            Hủy
+          </button>,
+          <button
+            key="submit"
+            className="action-button primary"
+            onClick={handleRequestRefund}
+            disabled={!refundReason}
+          >
+            Gửi yêu cầu
+          </button>,
+        ]}
+      >
+        <p>Vui lòng nhập lý do yêu cầu hoàn tiền:</p>
+        <input
+          type="text"
+          value={refundReason}
+          onChange={(e) => setRefundReason(e.target.value)}
+          placeholder="Lý do hoàn tiền"
+          style={{ width: "100%", padding: "8px", marginTop: "8px" }}
+        />
       </Modal>
     </>
   );
