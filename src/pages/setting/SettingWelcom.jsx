@@ -5,6 +5,7 @@ import {GrUpdate} from "react-icons/gr";
 import { MdManageAccounts,MdOutlineProductionQuantityLimits, MdProductionQuantityLimits } from "react-icons/md";
 import { TbLockPassword } from "react-icons/tb";
 import { IoIosLogOut } from "react-icons/io";
+import { BiPackage } from "react-icons/bi";
 
 const SettingWelcome = () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -23,7 +24,13 @@ const SettingWelcome = () => {
                             <>
                                 <li>Quản lý người dùng <MdManageAccounts/></li>
                                 <li>Quản lý sản phẩm <MdOutlineProductionQuantityLimits/></li>
+                                <li>Quản lý đơn hàng <BiPackage/></li>
                             </>
+                        )
+                    }
+                    {
+                        user?.role === "shipper" && (
+                            <li>Danh sách đơn hàng<BiPackage/></li>
                         )
                     }
                         <li>Đổi mật khẩu <TbLockPassword/></li>
