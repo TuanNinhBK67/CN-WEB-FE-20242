@@ -1,54 +1,107 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { message } from "antd";
+import { FaCheckCircle, FaFileInvoice, FaHome, FaShoppingBag } from "react-icons/fa";
+import axios from "axios";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import "./PaymentResult.scss";
-import { FaCheckCircle, FaFileInvoice, FaHome, FaShoppingBag } from "react-icons/fa";
-import axios from "axios";
 
 const PaymentSuccess = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchInvoiceData = async () => {
       try {
-        // Trong thực tế, sẽ gọi API backend để lấy thông tin
-        // const response = await axios.get(`/api/invoices/${orderId}`);
-        // setInvoice(response.data);
-        
-        // Dữ liệu mẫu cho demo
+        setLoading(true);
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (!user) {
+          message.error("Vui lòng đăng nhập để xem thông tin hóa đơn");
+          navigate("/login");
+          return;
+        }
+
+        // Bước 1: Lấy thông tin đơn hàng
+        const orderResponse = await axios.get(`/api/orders/${orderId}`);
+        if (!orderResponse.data.success) {
+          throw new Error("Không thể tải thông tin đơn hàng");
+        }
+        const order = orderResponse.data.order;
+
+        // Bước 2: Lấy thông tin hóa đơn
+        if (!order.invoice_id) {
+          throw new Error("Không tìm thấy hóa đơn cho đơn hàng này");
+        }
+        const invoiceResponse = await axios.get(`/api/invoices/${order.invoice_id}`);
+        if (!invoiceResponse.data.success) {
+          throw new Error("Không thể tải thông tin hóa đơn");
+        }
+        const invoiceData = invoiceResponse.data.invoice;
+
+        // Ánh xạ dữ liệu API sang định dạng giao diện
         setInvoice({
-          id: "INV" + Date.now().toString().slice(-6),
-          orderNumber: orderId || "12345",
-          transactionId: "TRANS_" + Date.now(),
-          date: new Date().toLocaleDateString("vi-VN"),
-          paymentMethod: "Thẻ tín dụng",
-          items: [
-            { name: "Áo thun nam", price: 250000, quantity: 2 },
-            { name: "Quần jean nữ", price: 450000, quantity: 1 },
-          ],
-          subtotal: 950000,
-          shippingFee: 30000,
-          total: 980000,
-          customerName: "Nguyễn Văn A",
-          shippingAddress: "123 Đường ABC, Quận XYZ, Hà Nội",
+          id: invoiceData.id,
+          orderNumber: order.id || "N/A",
+          transactionId: order.transaction_id || "N/A",
+          date: new Date(invoiceData.created_at || invoiceData.createdAt).toLocaleDateString("vi-VN"),
+          paymentMethod: getPaymentMethodLabel(order.payment_method || "N/A"),
+          items: invoiceData.items || [],
+          subtotal: parseFloat(invoiceData.total_amount) - (order.shipping_fee || 0),
+          shippingFee: order.shipping_fee || 0,
+          total: parseFloat(invoiceData.total_amount || 0),
+          customerName: invoiceData.user?.full_name || "N/A",
+          shippingAddress: order.shipping_address || "N/A",
         });
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching invoice:", error);
+        console.error("Lỗi khi tải hóa đơn:", error);
+        setError(error.message || "Đã xảy ra lỗi khi tải thông tin hóa đơn");
         setLoading(false);
       }
     };
 
-    fetchInvoiceData();
-  }, [orderId]);
+    if (orderId) {
+      fetchInvoiceData();
+    }
+  }, [orderId, navigate]);
 
-  const handleDownloadInvoice = () => {
-    // Giả lập tải hóa đơn
-    alert("Tính năng tải hóa đơn đang được phát triển");
+  const getPaymentMethodLabel = (method) => {
+    switch (method.toLowerCase()) {
+      case "credit_card":
+        return "Thẻ tín dụng/ghi nợ";
+      case "momo":
+        return "MoMo";
+      case "vnpay":
+        return "VnPay";
+      case "paypal":
+        return "PayPal";
+      default:
+        return method || "Không xác định";
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    try {
+      const response = await axios.get(`/api/invoices/${invoice.id}/download`, {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `hoa-don-${invoice.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      message.success("Tải hóa đơn thành công");
+    } catch (error) {
+      console.error("Lỗi khi tải hóa đơn:", error);
+      message.error("Không thể tải hóa đơn. Vui lòng thử lại sau.");
+    }
   };
 
   if (loading) {
@@ -58,6 +111,24 @@ const PaymentSuccess = () => {
         <div className="payment-result-container">
           <div className="loading-spinner"></div>
           <p>Đang tải thông tin hóa đơn...</p>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (error || !invoice) {
+    return (
+      <>
+        <Header />
+        <div className="payment-result-container error">
+          <h1>Có lỗi xảy ra</h1>
+          <p>{error || "Không thể tải thông tin hóa đơn. Vui lòng thử lại sau."}</p>
+          <div className="action-buttons">
+            <button className="secondary-button" onClick={() => navigate("/")}>
+              <FaHome /> Về trang chủ
+            </button>
+          </div>
         </div>
         <Footer />
       </>
@@ -117,8 +188,8 @@ const PaymentSuccess = () => {
                   <tr key={index}>
                     <td>{item.name}</td>
                     <td>{item.quantity}</td>
-                    <td>{item.price.toLocaleString("vi-VN")} ₫</td>
-                    <td>{(item.price * item.quantity).toLocaleString("vi-VN")} ₫</td>
+                    <td>{Number(item.price).toLocaleString("vi-VN")} ₫</td>
+                    <td>{(Number(item.price) * item.quantity).toLocaleString("vi-VN")} ₫</td>
                   </tr>
                 ))}
               </tbody>
@@ -128,15 +199,15 @@ const PaymentSuccess = () => {
           <div className="invoice-summary">
             <div className="summary-row">
               <span>Tạm tính:</span>
-              <span>{invoice.subtotal.toLocaleString("vi-VN")} ₫</span>
+              <span>{Number(invoice.subtotal).toLocaleString("vi-VN")} ₫</span>
             </div>
             <div className="summary-row">
               <span>Phí vận chuyển:</span>
-              <span>{invoice.shippingFee.toLocaleString("vi-VN")} ₫</span>
+              <span>{Number(invoice.shippingFee).toLocaleString("vi-VN")} ₫</span>
             </div>
             <div className="summary-total">
               <span>Tổng cộng:</span>
-              <span>{invoice.total.toLocaleString("vi-VN")} ₫</span>
+              <span>{Number(invoice.total).toLocaleString("vi-VN")} ₫</span>
             </div>
           </div>
         </div>
