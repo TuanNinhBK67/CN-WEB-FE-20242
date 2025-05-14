@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Modal, Spin, message } from "antd";
+import { FaFileInvoice, FaSearch, FaFilter } from "react-icons/fa";
+import axios from "axios";
 import "./PaymentHistory.scss";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import SettingBoard from "../../components/SettingBoard";
-import { FaFileInvoice, FaSearch, FaFilter } from "react-icons/fa";
-import axios from "axios";
 
 const PaymentHistory = () => {
   const navigate = useNavigate();
@@ -13,73 +14,42 @@ const PaymentHistory = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [invoiceModalVisible, setInvoiceModalVisible] = useState(false);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
 
   useEffect(() => {
     const fetchPayments = async () => {
+      setLoading(true);
       try {
         const user = JSON.parse(localStorage.getItem("user"));
         if (!user) {
+          message.error("Vui lòng đăng nhập để xem lịch sử thanh toán");
           navigate("/login");
           return;
         }
 
-        // Ở đây sẽ gọi API để lấy lịch sử thanh toán
-        // Giả lập dữ liệu cho demo
-        setPayments([
-          {
-            id: 1,
-            orderId: "ORD12345",
-            transactionId: "TRANS_167834290",
-            date: "2025-04-15",
-            amount: 980000,
-            paymentMethod: "credit_card",
-            status: "successful",
-            invoiceId: "INV789012"
-          },
-          {
-            id: 2,
-            orderId: "ORD12346",
-            transactionId: "TRANS_167834291",
-            date: "2025-04-10",
-            amount: 450000,
-            paymentMethod: "momo",
-            status: "successful",
-            invoiceId: "INV789013"
-          },
-          {
-            id: 3,
-            orderId: "ORD12347",
-            transactionId: "TRANS_167834292",
-            date: "2025-04-05",
-            amount: 1250000,
-            paymentMethod: "vnpay",
-            status: "failed",
-            invoiceId: null
-          },
-          {
-            id: 4,
-            orderId: "ORD12348",
-            transactionId: "TRANS_167834293",
-            date: "2025-03-28",
-            amount: 780000,
-            paymentMethod: "paypal",
-            status: "successful",
-            invoiceId: "INV789014"
-          },
-          {
-            id: 5,
-            orderId: "ORD12349",
-            transactionId: "TRANS_167834294",
-            date: "2025-03-20",
-            amount: 350000,
-            paymentMethod: "credit_card",
-            status: "pending",
-            invoiceId: null
-          }
-        ]);
-        setLoading(false);
+        const response = await axios.get("/api/payments");
+        if (response.data.success) {
+          // Giả định API trả về cấu trúc tương tự Mã 2, ánh xạ sang định dạng của Mã 1
+          const formattedPayments = response.data.payments.map((payment) => ({
+            id: payment.id,
+            orderId: payment.order?.id || "N/A",
+            transactionId: payment.transaction_id || "N/A",
+            date: payment.created_at,
+            amount: payment.amount,
+            paymentMethod: payment.payment_method,
+            status: payment.status.toLowerCase(),
+            invoiceId: payment.invoice_id || null,
+          }));
+          setPayments(formattedPayments);
+        } else {
+          message.error("Không thể tải lịch sử thanh toán");
+        }
       } catch (error) {
-        console.error("Error fetching payment history:", error);
+        console.error("Lỗi khi tải lịch sử thanh toán:", error);
+        message.error("Đã xảy ra lỗi khi tải lịch sử thanh toán");
+      } finally {
         setLoading(false);
       }
     };
@@ -87,9 +57,42 @@ const PaymentHistory = () => {
     fetchPayments();
   }, [navigate]);
 
+  const viewInvoice = async (invoiceId) => {
+    setInvoiceLoading(true);
+    setInvoiceModalVisible(true);
+    try {
+      const response = await axios.get(`/api/invoices/${invoiceId}`);
+      if (response.data.success) {
+        setSelectedInvoice(response.data.invoice);
+      } else {
+        message.error("Không thể tải chi tiết hóa đơn");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải hóa đơn:", error);
+      message.error("Đã xảy ra lỗi khi tải chi tiết hóa đơn");
+    } finally {
+      setInvoiceLoading(false);
+    }
+  };
+
+  const handleRetryPayment = async (orderId) => {
+    try {
+      const response = await axios.get(`/api/payments/status/${orderId}`);
+      if (response.data.success && response.data.status === "pending") {
+        navigate(`/checkout/${orderId}`);
+      } else {
+        message.info(`Trạng thái thanh toán: ${response.data.status}`);
+      }
+    } catch (error) {
+      console.error("Lỗi khi kiểm tra trạng thái thanh toán:", error);
+      message.error("Đã xảy ra lỗi khi kiểm tra trạng thái thanh toán");
+    }
+  };
+
   const getStatusLabel = (status) => {
     switch (status) {
       case "successful":
+      case "completed":
         return <span className="status-badge success">Thành công</span>;
       case "pending":
         return <span className="status-badge pending">Đang xử lý</span>;
@@ -111,23 +114,13 @@ const PaymentHistory = () => {
       case "paypal":
         return "PayPal";
       default:
-        return "Không xác định";
+        return method || "Không xác định";
     }
   };
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-    return new Date(dateString).toLocaleDateString('vi-VN', options);
-  };
-
-  const handleViewInvoice = (invoiceId, status) => {
-    if (status === "successful" && invoiceId) {
-      navigate(`/payment/invoice/${invoiceId}`);
-    }
-  };
-
-  const handleRetryPayment = (orderId) => {
-    navigate(`/checkout/${orderId}`);
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    return new Date(dateString).toLocaleDateString("vi-VN", options);
   };
 
   const filteredPayments = payments
@@ -163,7 +156,6 @@ const PaymentHistory = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
-
                 <div className="filter-dropdown">
                   <FaFilter />
                   <select
@@ -180,7 +172,7 @@ const PaymentHistory = () => {
 
               {loading ? (
                 <div className="loading-container">
-                  <div className="loading-spinner"></div>
+                  <Spin />
                   <p>Đang tải lịch sử thanh toán...</p>
                 </div>
               ) : filteredPayments.length === 0 ? (
@@ -209,17 +201,17 @@ const PaymentHistory = () => {
                           <td>{getPaymentMethodLabel(payment.paymentMethod)}</td>
                           <td>{getStatusLabel(payment.status)}</td>
                           <td>
-                            {payment.status === "successful" ? (
+                            {payment.status === "successful" ||
+                            payment.status === "completed" ? (
                               <button
                                 className="action-button view-invoice"
-                                onClick={() =>
-                                  handleViewInvoice(payment.invoiceId, payment.status)
-                                }
+                                onClick={() => viewInvoice(payment.invoiceId)}
                                 disabled={!payment.invoiceId}
                               >
                                 <FaFileInvoice /> Xem hóa đơn
                               </button>
-                            ) : payment.status === "failed" ? (
+                            ) : payment.status === "failed" ||
+                              payment.status === "pending" ? (
                               <button
                                 className="action-button retry-payment"
                                 onClick={() => handleRetryPayment(payment.orderId)}
@@ -241,6 +233,80 @@ const PaymentHistory = () => {
         </div>
       </div>
       <Footer />
+
+      <Modal
+        title="Chi tiết hóa đơn"
+        open={invoiceModalVisible}
+        onCancel={() => setInvoiceModalVisible(false)}
+        footer={[
+          <button
+            key="close"
+            className="action-button"
+            onClick={() => setInvoiceModalVisible(false)}
+          >
+            Đóng
+          </button>,
+        ]}
+        width={700}
+      >
+        {invoiceLoading ? (
+          <div style={{ textAlign: "center", padding: "20px" }}>
+            <Spin />
+            <p>Đang tải chi tiết hóa đơn...</p>
+          </div>
+        ) : selectedInvoice ? (
+          <div className="invoice-details">
+            <div className="invoice-header">
+              <h3>Hóa đơn #{selectedInvoice.invoice_number}</h3>
+              <p>Ngày: {formatDate(selectedInvoice.created_at)}</p>
+            </div>
+            <div className="invoice-customer">
+              <h4>Thông tin khách hàng</h4>
+              <p>Tên: {selectedInvoice.customer_name || "N/A"}</p>
+              <p>Email: {selectedInvoice.customer_email || "N/A"}</p>
+            </div>
+            <div className="invoice-items">
+              <h4>Danh sách mặt hàng</h4>
+              <table className="payment-table">
+                <thead>
+                  <tr>
+                    <th>Mặt hàng</th>
+                    <th>Số lượng</th>
+                    <th>Đơn giá</th>
+                    <th>Tổng</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedInvoice.items?.map((item) => (
+                    <tr key={item.id}>
+                      <td>{item.name}</td>
+                      <td>{item.quantity}</td>
+                      <td>{item.price.toLocaleString("vi-VN")} ₫</td>
+                      <td>{(item.price * item.quantity).toLocaleString("vi-VN")} ₫</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="invoice-summary">
+              <div className="summary-item">
+                <span>Tạm tính:</span>
+                <span>{selectedInvoice.subtotal?.toLocaleString("vi-VN")} ₫</span>
+              </div>
+              <div className="summary-item">
+                <span>Thuế:</span>
+                <span>{selectedInvoice.tax?.toLocaleString("vi-VN")} ₫</span>
+              </div>
+              <div className="summary-item total">
+                <span>Tổng cộng:</span>
+                <span>{selectedInvoice.total?.toLocaleString("vi-VN")} ₫</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <p>Không có dữ liệu hóa đơn</p>
+        )}
+      </Modal>
     </>
   );
 };
