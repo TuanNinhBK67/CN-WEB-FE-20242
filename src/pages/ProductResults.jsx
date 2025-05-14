@@ -126,9 +126,15 @@ const ProductResults = () => {
   }, [location.search]);
 
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
       <Header onSearch={onSearch} />
-      <main className="product-details">
+      <main className="product-details" style={{ flex: 1 }}>
         {categoryId ? (
           <>
             <h1>
@@ -263,7 +269,7 @@ const ProductResults = () => {
         )}
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 
