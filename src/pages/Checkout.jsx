@@ -29,17 +29,8 @@ const Checkout = () => {
           return;
         }
 
-        // Điền dữ liệu mẫu cho demo - trong thực tế sẽ lấy từ API
-        setOrder({
-          id: orderId || "12345",
-          items: [
-            { name: "Áo thun nam", price: 250000, quantity: 2 },
-            { name: "Quần jean nữ", price: 450000, quantity: 1 },
-          ],
-          shippingFee: 30000,
-          total: 980000,
-          address: "123 Đường ABC, Quận XYZ, Hà Nội",
-        });
+        const response = await axios.get(`/api/orders/${orderId}`);
+        setOrder(response.data);
       } catch (error) {
         console.error("Error fetching order:", error);
       }
