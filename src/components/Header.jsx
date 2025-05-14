@@ -11,12 +11,18 @@ import {
 } from "react-icons/fa";
 import { IoSettings, IoLogOutOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
+import CartPopup from "../pages/cart/CartPopup";
 
 const Header = () => {
     const [user, setUser] = useState(null);
     const location = useLocation();
-
     const navigate = useNavigate();
+    const [isOpenCart, setIsOpenCart] = useState(false);
+    const [cartItems, setCartItems] = useState([
+        { id: 1, name: "Áo thun", price: 150000, quantity: 2 },
+        { id: 2, name: "Quần jeans", price: 300000, quantity: 1 },
+    ]);
+
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
@@ -32,7 +38,28 @@ const Header = () => {
     };
 
     const openCart = () => {
-        navigate("/cart", { state: { background: location } });
+        // navigate("/cart", { state: { background: location } });
+        setIsOpenCart(true);
+    };
+
+    const handleRemove = (id) => {
+        setCartItems(cartItems.filter((item) => item.id !== id));
+    };
+
+    const handleQuantityChange = (id, quantity) => {
+        setCartItems(
+            cartItems.map((item) =>
+                item.id === id ? { ...item, quantity } : item
+            )
+        );
+    };
+
+    const handleCheckout = () => {
+        alert("Chuyển đến trang thanh toán");
+    };
+
+    const handleOrder = () => {
+        alert("Đặt hàng thành công!");
     };
 
     return (
@@ -127,6 +154,17 @@ const Header = () => {
                 <a href="#">Gấu Bông To Giá Rẻ</a>
                 <a href="#">Kẹp Tóc 50 Cái</a>
             </div>
+
+            {isOpenCart && (
+                <CartPopup
+                    items={cartItems}   
+                    onClose={() => setIsOpenCart(false)}
+                    onRemove={handleRemove}
+                    onQuantityChange={handleQuantityChange}
+                    onCheckout={handleCheckout}
+                    onOrder={handleOrder}
+                />
+            )}           
         </header>
     );
 };

@@ -1,0 +1,127 @@
+import React, { useState } from "react";
+
+const ordersData = [
+    {
+        id: "DH001",
+        customer: "Nguyễn Văn A",
+        total: 750000,
+        status: "Chờ xác nhận",
+        date: "2025-05-10",
+    },
+    {
+        id: "DH002",
+        customer: "Trần Thị B",
+        total: 450000,
+        status: "Đã giao",
+        date: "2025-05-11",
+    },
+    {
+        id: "DH003",
+        customer: "Lê Văn C",
+        total: 980000,
+        status: "Đang giao",
+        date: "2025-05-12",
+    },
+];
+
+const OrderManagement = () => {
+    const [orders, setOrders] = useState(ordersData);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    const handleStatusChange = (id, newStatus) => {
+        setOrders((prev) =>
+            prev.map((order) =>
+                order.id === id ? { ...order, status: newStatus } : order
+            )
+        );
+    };
+
+    const filteredOrders = orders.filter((order) =>
+        order.customer.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div className="p-6 bg-gray-100 min-h-screen">
+            <h1 className="text-3xl font-bold mb-6">Quản lý đơn hàng</h1>
+
+            <div className="mb-4 flex justify-between items-center">
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm theo tên khách hàng..."
+                    className="border border-gray-300 rounded px-4 py-2 w-1/3"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white shadow-md rounded-lg">
+                    <thead>
+                        <tr className="bg-gradient-to-r from-blue-600 to-blue-400 text-white">
+                            <th className="py-3 px-4 text-left">Mã Đơn</th>
+                            <th className="py-3 px-4 text-left">Khách hàng</th>
+                            <th className="py-3 px-4 text-left">Ngày đặt</th>
+                            <th className="py-3 px-4 text-left">Tổng tiền</th>
+                            <th className="py-3 px-4 text-left">Trạng thái</th>
+                            <th className="py-3 px-4 text-left">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredOrders.map((order) => (
+                            <tr key={order.id} className="border-b">
+                                <td className="py-3 px-4">{order.id}</td>
+                                <td className="py-3 px-4">{order.customer}</td>
+                                <td className="py-3 px-4">{order.date}</td>
+                                <td className="py-3 px-4">
+                                    {order.total.toLocaleString()}đ
+                                </td>
+                                <td className="py-3 px-4">
+                                    <span
+                                        className={`px-2 py-1 rounded text-sm font-medium ${
+                                            order.status === "Đã giao"
+                                                ? "bg-green-100 text-green-800"
+                                                : order.status ===
+                                                  "Chờ xác nhận"
+                                                ? "bg-yellow-100 text-yellow-800"
+                                                : "bg-blue-100 text-blue-800"
+                                        }`}
+                                    >
+                                        {order.status}
+                                    </span>
+                                </td>
+                                <td className="py-3 px-4 space-x-2">
+                                    <select
+                                        className="border px-2 py-1 rounded text-sm"
+                                        value={order.status}
+                                        onChange={(e) =>
+                                            handleStatusChange(
+                                                order.id,
+                                                e.target.value
+                                            )
+                                        }
+                                    >
+                                        <option>Chờ xác nhận</option>
+                                        <option>Đang giao</option>
+                                        <option>Đã giao</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        ))}
+                        {filteredOrders.length === 0 && (
+                            <tr>
+                                <td
+                                    colSpan={6}
+                                    className="text-center py-6 text-gray-500"
+                                >
+                                    Không tìm thấy đơn hàng nào.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+export default OrderManagement;

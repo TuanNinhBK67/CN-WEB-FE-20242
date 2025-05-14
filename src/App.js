@@ -13,9 +13,7 @@ import RequireGuest from "./components/RequireGuest.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import ForgotPassword from "./pages/user/ForgotPassword.jsx";
 import ResetPassword from "./pages/user/ResetPassword.jsx";
-import Cart from "./pages/cart/Cart.jsx";
-import ModalCart from "./pages/cart/components/ModalCart.jsx";
-import Modal from "./pages/cart/components/ModalCart.jsx";
+import OrderManagement from "./pages/order/OrderManagement";
 
 function App() {
     return (
@@ -73,7 +71,7 @@ function App() {
                 <Route path="password" element={<Changepassword />} />
             </Route>
 
-            <Route path="/cart" element={<ModalCart> <Cart></Cart> </ModalCart>} />
+            <Route path="/admin/orders" element={<OrderManagement />} />
         </Routes>
     );
 }
