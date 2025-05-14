@@ -12,7 +12,7 @@ import {
 import { IoSettings, IoLogOutOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
-const Header = ({ onSearch }) => {
+const Header = () => {
   const [user, setUser] = useState(null);
 
   const [keyword, setKeyword] = useState("");
@@ -28,13 +28,13 @@ const Header = ({ onSearch }) => {
 
   const handleSearchClick = () => {
     if (keyword.trim()) {
-      onSearch(keyword); // Gọi callback props để truyền từ khóa tìm kiếm
+      navigate(`/search?keyword=${encodeURIComponent(keyword.trim())}`);
     }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && keyword.trim()) {
-      onSearch(keyword); // Gọi callback khi nhấn Enter
+      navigate(`/search?keyword=${encodeURIComponent(keyword.trim())}`);
     }
   };
 

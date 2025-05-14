@@ -16,6 +16,9 @@ import ForgotPassword from "./pages/user/ForgotPassword.jsx";
 import ResetPassword from "./pages/user/ResetPassword.jsx";
 import ProductResults from "./pages/ProductResults"; // đường dẫn tùy bạn
 import ManageProduct from "./pages/setting/ManageProduct.jsx";
+import AddProduct from "./pages/setting/addProduct.jsx";
+import ProductCategory from "./pages/setting/ProductCategory.jsx";
+import ChangeProductInfo from "./pages/setting/ChangeProductInfo.jsx";
 
 function App() {
   return (
@@ -67,9 +70,22 @@ function App() {
         <Route path="dashboard/user" element={<DashboardUser />} />
         <Route path="password" element={<Changepassword />} />
         <Route path="dashboard/product" element={<ManageProduct />} />
+        <Route path="addProduct" element={<AddProduct />} />
+        <Route path="product-category/:id" element={<ProductCategory />} />
+        <Route path="change-product/:id" element={<ChangeProductInfo />} />
       </Route>
       <Route path="/" element={<HomePage />} />
-      <Route path="/product/:id" element={<ProductResults />} />
+      <Route
+        path="/product/:id"
+        element={<ProductResults key={window.location.pathname} />}
+      />
+      <Route path="/search" element={<ProductResults />} />
+      <Route path="/category/:categoryId" element={<ProductResults />} />
+      <Route path="/addProduct" element={<AddProduct />} />
+      <Route
+        path="/setting/change-product/:id"
+        element={<ChangeProductInfo />}
+      />
       // others routes
     </Routes>
     // <div className="App">

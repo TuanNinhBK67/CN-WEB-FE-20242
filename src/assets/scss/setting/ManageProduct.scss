@@ -95,3 +95,47 @@ button.active {
   color: red;
   text-align: center;
 }
+
+.content-container {
+  display: flex;
+  gap: 20px;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+
+  td {
+    padding: 8px 12px; /* Reduce padding for closer spacing */
+    vertical-align: middle;
+  }
+
+  label {
+    font-weight: bold;
+    display: block; /* Ensure consistent alignment */
+    margin-bottom: 5px; /* Add a small gap between label and input */
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensure consistent sizing */
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.add-product-form {
+  max-width: 600px; /* Limit the form width for better alignment */
+  margin: 0 auto; /* Center the form */
+}

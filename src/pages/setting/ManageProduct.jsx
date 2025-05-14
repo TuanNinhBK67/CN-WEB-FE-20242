@@ -87,7 +87,7 @@ const ManageProduct = () => {
   };
 
   const handleCategory = (id) => {
-    navigate(`/api/products/${id}/category`);
+    navigate(`/setting/product-category/${id}`);
   };
 
   const filteredProducts = products.filter((product) =>
@@ -127,10 +127,14 @@ const ManageProduct = () => {
               <td>{product.stock}</td>
               <td>
                 <button onClick={() => handleDelete(product.id)}>Xóa</button>
-                <button onClick={() => handleCategory(product.id)}>
+                {/* <button onClick={() => handleCategory(product.id)}>
                   Phân loại
-                </button>
-                <button onClick={() => navigate("/ChangeProductInfo")}>
+                </button> */}
+                <button
+                  onClick={() =>
+                    navigate(`/setting/change-product/${product.id}`)
+                  }
+                >
                   Chỉnh sửa
                 </button>
               </td>
