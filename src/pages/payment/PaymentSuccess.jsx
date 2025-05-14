@@ -25,14 +25,22 @@ const PaymentSuccess = () => {
           return;
         }
 
-        // Bước 1: Lấy thông tin đơn hàng
+        // Bước 1: Lấy thông tin đơn hàng để có transaction_id
         const orderResponse = await axios.get(`/api/orders/${orderId}`);
         if (!orderResponse.data.success) {
           throw new Error("Không thể tải thông tin đơn hàng");
         }
         const order = orderResponse.data.order;
 
-        // Bước 2: Lấy thông tin hóa đơn
+        // Bước 2: Kiểm tra trạng thái thanh toán
+        const confirmResponse = await axios.get(`/api/payments/confirm?order_id=${orderId}&transaction_id=${order.transaction_id}`);
+        if (!confirmResponse.data.success) {
+          message.error("Thanh toán chưa hoàn tất");
+          navigate(`/payment/failed/${orderId}`);
+          return;
+        }
+
+        // Bước 3: Lấy thông tin hóa đơn
         if (!order.invoice_id) {
           throw new Error("Không tìm thấy hóa đơn cho đơn hàng này");
         }
@@ -145,6 +153,7 @@ const PaymentSuccess = () => {
           <p>
             Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được xác nhận và đang
             được xử lý.
+ Discovering additional properties in the invoice object
           </p>
         </div>
 
