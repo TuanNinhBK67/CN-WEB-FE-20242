@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -19,6 +19,18 @@ const AddProduct = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/products/categories")
+      .then((res) => {
+        if (res.data && res.data.data) {
+          setCategories(res.data.data);
+        }
+      })
+      .catch(() => setCategories([]));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -126,19 +138,26 @@ const AddProduct = () => {
                       <label htmlFor="category_id">ID danh mục</label>
                     </td>
                     <td>
-                      <input
-                        type="number"
+                      <select
                         id="category_id"
                         name="category_id"
                         value={formData.category_id}
                         onChange={handleChange}
                         required
-                      />
+                        style={{ minWidth: 250, minHeight: 40, fontSize: 16 }}
+                      >
+                        <option value="">-- Chọn danh mục --</option>
+                        {categories.map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.id} - {cat.name}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                   </tr>
                   <tr>
                     <td>
-                      <label htmlFor="branch_id">ID chi nhánh</label>
+                      <label htmlFor="branch_id">ID Nhãn hàng</label>
                     </td>
                     <td>
                       <input
