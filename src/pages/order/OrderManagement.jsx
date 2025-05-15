@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
+import orderService from '../../services/orderService'; 
 
 const ordersData = [
     {
@@ -30,6 +31,17 @@ const ordersData = [
 const OrderManagement = () => {
     const [orders, setOrders] = useState(ordersData);
     const [searchTerm, setSearchTerm] = useState("");
+
+    useEffect(() => {
+        orderService
+            .getAllOrders()
+            .then((response) => {
+                console.log("Danh sách đơn hàng:", response.data);
+            })
+            .catch((error) => {
+                console.error("Lỗi khi lấy danh sách đơn hàng:", error);
+            });
+    }, []);
 
     const handleStatusChange = (id, newStatus) => {
         setOrders((prev) =>
