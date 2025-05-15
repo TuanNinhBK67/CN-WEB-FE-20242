@@ -6,12 +6,17 @@ import "../../assets/scss/user/forgotpassword.scss"
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [msg, setMsg] = useState("");
-
+    const [showPopup, setshowPopup] = useState(false);
+ 
     const handleSubmit = async(e) => {
         e.preventDefault();
         try{
             const res = await forgotPassword(email);
             setMsg(res.data.errMessage);
+            if(res.data.errCode === 0){
+                setshowPopup(true);
+                setTimeout(() => setshowPopup(false), 2000);
+            }
         }
         catch(err){
             setMsg("Đã có lỗi, vui lòng thử lại")
@@ -19,6 +24,7 @@ const ForgotPassword = () => {
     }
 
     return(
+        <>
         <div className="forgot-password-wrapper"> 
             <form onSubmit={handleSubmit}>
                 <h3>Quên mật khẩu</h3>
@@ -27,6 +33,12 @@ const ForgotPassword = () => {
                 <p>{msg}</p>
             </form>
         </div>
+        {showPopup && (
+            <div className="popup">
+                ✅ Email đặt lại mật khẩu đã được gửi!
+            </div>
+        )}
+        </>
     )
 }
 

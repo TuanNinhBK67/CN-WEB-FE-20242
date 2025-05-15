@@ -8,6 +8,7 @@ const ResetPassword = () => {
 
     const [newPassword, setNewPassword] = useState("");
     const [msg, setMsg] = useState("");
+    const [showPopup, setshowPopup] = useState(false);
     const token = new URLSearchParams(window.location.search).get("token");
 
     const handleSubmit = async(e) => {
@@ -15,7 +16,11 @@ const ResetPassword = () => {
         try{
             const res = await resetPassword(token, newPassword);
             setMsg(res.data.errMessage);
-            navigate("/")
+            if(res.data.errCode === 0 ){
+                setshowPopup(true);
+                setTimeout(() => setshowPopup(false), 3000);
+            }
+            // navigate("/")
         }
         catch(err){
             setMsg("Đặt lại mật khẩu thất bại")
@@ -23,6 +28,7 @@ const ResetPassword = () => {
     }
 
     return(
+        <>
         <div className="reset-password-wrapper">
             <form onSubmit={handleSubmit}>
                 <h3>Đặt lại mật khẩu</h3>
@@ -31,6 +37,12 @@ const ResetPassword = () => {
                 <p>{msg}</p>
             </form>
         </div>
+        {showPopup && (
+            <div className="popup">
+                Mật khẩu đã được đặt lại thành công
+            </div>
+        )}
+        </>
     )
 }
 export default ResetPassword;
