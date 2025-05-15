@@ -6,9 +6,11 @@ import "../assets/scss/ProductResults.scss";
 import { handleSearch } from "../services/SearchService";
 import { addToCart } from "../services/productService";
 
+const API_URL = `${process.env.REACT_APP_API_URL}/api/products`
+
 const ProductResults = () => {
+  
   const { id, categoryId } = useParams(); // id: product id, categoryId: category id
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [product, setProduct] = useState(null);
@@ -18,6 +20,9 @@ const ProductResults = () => {
   const [categoryProducts, setCategoryProducts] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [addCartMessage, setAddCartMessage] = useState("");
+
+  const navigate = useNavigate();
+  const storedUser = JSON.parse(localStorage.getItem("user"))
 
   const onSearch = (keyword) => {
     handleSearch(keyword, setSearchKeyword, setSearchResults);
@@ -33,7 +38,7 @@ const ProductResults = () => {
       const fetchCategoryProducts = async () => {
         try {
           const res = await fetch(
-            `http://localhost:8080/api/products/category/${categoryId}`
+            `${API_URL}/category/${categoryId}`
           );
           if (!res.ok) throw new Error("Không thể tải sản phẩm theo danh mục");
           const data = await res.json();
@@ -42,7 +47,7 @@ const ProductResults = () => {
           if (data.length > 0 && data[0].category_id) {
             // Gọi API lấy tên danh mục
             const catRes = await fetch(
-              `http://localhost:8080/api/products/${data[0].id}/category`
+              `${API_URL}/${data[0].id}/category`
             );
             if (catRes.ok) {
               const catData = await catRes.json();
@@ -66,7 +71,7 @@ const ProductResults = () => {
       const fetchProduct = async () => {
         try {
           const response = await fetch(
-            `http://localhost:8080/api/products/${id}`
+            `${API_URL}/${id}`
           );
           if (!response.ok) {
             throw new Error("Không thể tải thông tin sản phẩm");
@@ -76,7 +81,7 @@ const ProductResults = () => {
 
           // Lấy danh mục sản phẩm
           const catRes = await fetch(
-            `http://localhost:8080/api/products/${id}/category`
+            `${API_URL}/${id}/category`
           );
           if (catRes.ok) {
             const catData = await catRes.json();
@@ -137,11 +142,12 @@ const ProductResults = () => {
       <main className="product-details" style={{ flex: 1 }}>
         {categoryId ? (
           <>
-            <h1>
-              Sản phẩm thuộc danh mục:{" "}
-              <span style={{ color: "#007bff" }}>{categoryName}</span>
-            </h1>
             {categoryProducts.length > 0 ? (
+              <>
+              <h1>
+                Sản phẩm thuộc danh mục:{" "}
+                <span style={{ color: "#007bff" }}>{categoryName}</span>
+              </h1>
               <div className="product-grid">
                 {categoryProducts.map((product) => (
                   <div
@@ -161,16 +167,40 @@ const ProductResults = () => {
                       <p className="product-description">
                         {product.description}
                       </p>
-                      <p className="product-price">
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                      </p>
+                      <div className="product-price">
+                          {Number(product.discount) > 0  ? (
+                            <>
+                            <span className="price-original">
+                              {Number(product.price).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                            <span className="price-discounted">
+                              {Number(
+                                product.price * (1 - product.discount / 100)
+                              ).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                          </>
+                          ) : (
+                            <>
+                            <span className="price-discounted">
+                              {Number(product.price).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                            </>
+                          )}
+                        </div>
                     </div>
                   </div>
                 ))}
               </div>
+              </>
             ) : (
               <p>Không có sản phẩm nào trong danh mục này.</p>
             )}
@@ -198,12 +228,35 @@ const ProductResults = () => {
                       <p className="product-description">
                         {product.description}
                       </p>
-                      <p className="product-price">
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                      </p>
+                        <div className="product-price">
+                          {Number(product.discount) > 0  ? (
+                            <>
+                            <span className="price-original">
+                              {Number(product.price).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                            <span className="price-discounted">
+                              {Number(
+                                product.price * (1 - product.discount / 100)
+                              ).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                          </>
+                          ) : (
+                            <>
+                            <span className="price-discounted">
+                              {Number(product.price).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                            </>
+                          )}
+                        </div>
                     </div>
                   </div>
                 ))}
@@ -223,12 +276,50 @@ const ProductResults = () => {
             </div>
             <div className="product-info-section">
               <h1 className="product-title">{product.name}</h1>
-              <p className="product-price">
-                {new Intl.NumberFormat("vi-VN", {
-                  style: "currency",
-                  currency: "VND",
-                }).format(product.price)}
-              </p>
+              <div style={{
+                display: "flex",
+                flexDirection: "column"
+              }}>
+                {Number(product.discount) > 0  ? (
+                  <>
+                    <span style={{
+                      textDecoration: "line-through",
+                      color: "#888",
+                      fontSize: "0.9rem"
+                    }}>
+                      {Number(product.price).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                    <span style={{
+                      color: "red",
+                      fontWeight: "bold",
+                      fontSize: "1.1rem"
+                    }}>
+                      {Number(
+                        product.price * (1 - product.discount / 100)
+                        ).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                    </>
+                      ) : (
+                        <>
+                          <span style={{
+                            color: "red",
+                            fontWeight: "bold",
+                            fontSize: "1.1rem"
+                          }}>
+                            {Number(product.price).toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                          </span>
+                        </>
+                      )}
+              </div>
               {/* Hiển thị danh mục sản phẩm có thể click */}
               <p className="product-category">
                 <strong>Danh mục:</strong>{" "}
@@ -249,13 +340,41 @@ const ProductResults = () => {
               </p>
               <p className="product-description">{product.description}</p>
               <div className="product-actions">
-                <button
-                  className="add-to-cart-button"
-                  onClick={handleAddToCart}
-                >
-                  Add to cart
-                </button>
-                <button className="buy-now-button">Buy now</button>
+                {!storedUser && (
+                  <button
+                    style={{
+                      padding: "12px 20px",
+                      backgroundColor: "#6c63ff",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "8px",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      transition: "background 0.3s",
+                    }}
+                    onClick={() => navigate("/login")}
+                  >
+                    Đăng nhập để mua sắm
+                  </button>
+                )}
+                {storedUser?.role === "customer" && (
+                  <>
+                  <button className="add-to-cart-button" onClick={handleAddToCart}>
+                    Add to cart
+                  </button>
+                  <button className="buy-now-button">Buy now</button>
+                  </>
+                )}
+                {storedUser?.role === "admin" && (
+                  <>
+                    <button className="manage-button" 
+                      onClick={() => navigate(`/setting/change-product/${product.id}`)}
+                    >Quản lý sản phẩm</button>
+                    <button className="delete-button">Xóa sản phẩm</button>
+                  </>
+                )}
               </div>
               {addCartMessage && (
                 <div style={{ color: "green", marginTop: 10 }}>

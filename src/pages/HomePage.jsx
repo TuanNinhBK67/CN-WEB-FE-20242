@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../assets/scss/HomePage.scss";
+import "../assets/scss/homepage.scss";
+
+const API_URL = `${process.env.REACT_APP_API_URL}/api/products`
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -12,10 +14,10 @@ const HomePage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/products")
+    fetch(API_URL)
       .then((res) => res.json())
       .then(setProducts);
-    fetch("http://localhost:8080/api/products/categories")
+    fetch(`${API_URL}/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data.data || data));
   }, []);
@@ -137,28 +139,16 @@ const HomePage = () => {
                         >
                           {product.name}
                         </h2>
-                        {product.discount > 0 ? (
-                          <>
-                            <span
-                              style={{
-                                textDecoration: "line-through",
-                                color: "#888",
-                                fontSize: 14,
-                                marginRight: 8,
-                              }}
-                            >
+                        <div className="product-price">
+                          {Number(product.discount) > 0  ? (
+                            <>
+                            <span className="price-original">
                               {Number(product.price).toLocaleString("vi-VN", {
                                 style: "currency",
                                 currency: "VND",
                               })}
                             </span>
-                            <span
-                              style={{
-                                color: "#e74c3c",
-                                fontWeight: 700,
-                                fontSize: 20,
-                              }}
-                            >
+                            <span className="price-discounted">
                               {Number(
                                 product.price * (1 - product.discount / 100)
                               ).toLocaleString("vi-VN", {
@@ -167,20 +157,17 @@ const HomePage = () => {
                               })}
                             </span>
                           </>
-                        ) : (
-                          <span
-                            style={{
-                              color: "#e74c3c",
-                              fontWeight: 700,
-                              fontSize: 20,
-                            }}
-                          >
-                            {Number(product.price).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                          </span>
-                        )}
+                          ) : (
+                            <>
+                            <span className="price-discounted">
+                              {Number(product.price).toLocaleString("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -223,28 +210,16 @@ const HomePage = () => {
                       >
                         {product.name}
                       </h2>
-                      {product.discount > 0 ? (
-                        <>
-                          <span
-                            style={{
-                              textDecoration: "line-through",
-                              color: "#888",
-                              fontSize: 14,
-                              marginRight: 8,
-                            }}
-                          >
+                      <div className="product-price">
+                        {Number(product.discount) > 0  ? (
+                          <>
+                          <span className="price-original">
                             {Number(product.price).toLocaleString("vi-VN", {
                               style: "currency",
                               currency: "VND",
                             })}
                           </span>
-                          <span
-                            style={{
-                              color: "#e74c3c",
-                              fontWeight: 700,
-                              fontSize: 20,
-                            }}
-                          >
+                          <span className="price-discounted">
                             {Number(
                               product.price * (1 - product.discount / 100)
                             ).toLocaleString("vi-VN", {
@@ -252,21 +227,18 @@ const HomePage = () => {
                               currency: "VND",
                             })}
                           </span>
-                        </>
+                      </>
                       ) : (
-                        <span
-                          style={{
-                            color: "#e74c3c",
-                            fontWeight: 700,
-                            fontSize: 20,
-                          }}
-                        >
+                        <>
+                        <span className="price-discounted">
                           {Number(product.price).toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}
                         </span>
+                        </>
                       )}
+                      </div>
                     </div>
                   </div>
                 ))}

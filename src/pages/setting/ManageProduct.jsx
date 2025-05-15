@@ -21,11 +21,13 @@ const ManageProduct = () => {
 
   const productsPerPage = 10;
 
+  const API_URL = `${process.env.REACT_APP_API_URL}/api/products`
+
   useEffect(() => {
     const fetchStockProducts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8080/api/products/stock/check"
+          `${API_URL}/stock/check`
         );
         setStockProducts(res.data);
       } catch (err) {
@@ -78,7 +80,7 @@ const ManageProduct = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/products/${id}`);
+      await axios.delete(`${API_URL}/${id}`);
       alert("Xóa sản phẩm thành công.");
       setStockProducts(stockProducts.filter((product) => product.id !== id));
     } catch (err) {
