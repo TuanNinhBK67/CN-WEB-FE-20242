@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../assets/scss/homepage.scss";
+import "../assets/scss/home.scss";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api/products`
 
