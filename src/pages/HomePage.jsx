@@ -1,71 +1,63 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, {useState, useEffect} from "react";
 import Header from "../components/Header";
-import Footer from "../components/Footer";
-import "../assets/scss/HomePage.scss";
-import { handleSearch } from "../services/SearchService";
+import Footer from "../components/Footer"
+import { getAllProducts } from "../services/productService";
+import "../assets/scss/homepage.scss"
+import SidebarCategories from "../components/CategoriesBoard";
+import { Link } from "react-router-dom";
 
 const HomePage = () => {
-  const [searchResults, setSearchResults] = useState([]);
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const navigate = useNavigate();
+    const [products, setProducts] = useState([]);
 
-  const onSearch = (keyword) => {
-    handleSearch(keyword, setSearchKeyword, setSearchResults);
-  };
+    useEffect(() => {
+        getAllProducts()
+        .then((res) => setProducts(res.data))
+        .catch((err) => console.error("Lỗi khi lấy sản phẩm:", err));
+    }, []);
 
-  const handleCardClick = (product) => {
-    navigate(`/product/${product.id}`, { state: product });
-  };
+    return (
+        <>
+        <Header></Header>
+        <div className="home-layout">
 
-  return (
-    <>
-      <Header onSearch={onSearch} />
-      <main className="homepage">
-        {searchKeyword ? (
-          <>
-            <h1>Kết quả tìm kiếm cho "{searchKeyword}"</h1>
-            {searchResults.length > 0 ? (
-              <div className="product-grid">
-                {searchResults.map((product) => (
-                  <div
-                    key={product.id}
-                    className="product-card"
-                    onClick={() => handleCardClick(product)}
-                  >
-                    <img
-                      src={
-                        product.image_url || "https://via.placeholder.com/150"
-                      }
-                      alt={product.name}
-                      className="product-image"
-                    />
-                    <div className="product-info">
-                      <h2 className="product-title">{product.name}</h2>
-                      <p className="product-description">
-                        {product.description}
-                      </p>
-                      <p className="product-price">
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>Không tìm thấy sản phẩm nào phù hợp.</p>
-            )}
-          </>
-        ) : (
-          <h1>This is homepage</h1>
-        )}
-      </main>
-      <Footer />
-    </>
-  );
-};
+        <aside className="sidebar">
+            <SidebarCategories></SidebarCategories>
+        </aside>
 
+        <div className="home-container">
+        {/* <h2 className="home-title">Danh sách sản phẩm</h2> */}
+        <div className="product-grid">
+            {products.map((p) => (
+                // sửa cái link thành chuyển sang sản phẩm cho tôi nhé 
+            <Link to={'/'} className="product-card" key={p.id}>
+                <img src={p.image_url} alt={p.name} className="product-img" />
+                <h3 className="product-name">{p.name}</h3>
+                <div className="product-price">
+                    {Number(p.discount) > 0 ? (
+                        <>
+                             <span className="price-original">
+                                {p.price.toLocaleString()}đ
+                            </span>
+                            <span className="price-discounted">
+                                {(p.price - p.discount).toLocaleString()}đ
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="price-discounted">
+                                {p.price.toLocaleString()}đ
+                            </span>
+                        </>
+                    )}
+                </div>
+            </Link>
+            ))}
+        </div>
+        </div>
+        </div>
+        <Footer></Footer>
+        </>
+    );
+
+}
 export default HomePage;
