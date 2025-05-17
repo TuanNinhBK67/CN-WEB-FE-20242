@@ -40,7 +40,7 @@ const Header = () => {
     const openCart = () => {
         // navigate("/cart", { state: { background: location } });
         setIsOpenCart(true);
-    };
+    };	
 
     const handleRemove = (id) => {
         setCartItems(cartItems.filter((item) => item.id !== id));

@@ -13,67 +13,82 @@ import RequireGuest from "./components/RequireGuest.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import ForgotPassword from "./pages/user/ForgotPassword.jsx";
 import ResetPassword from "./pages/user/ResetPassword.jsx";
-import OrderManagement from "./pages/order/OrderManagement";
+import ProductResults from "./pages/ProductResults";
+import ManageProduct from "./pages/setting/ManageProduct.jsx";
+import AddProduct from "./pages/setting/addProduct.jsx";
+import ProductCategory from "./pages/setting/ProductCategory.jsx";
+import ChangeProductInfo from "./pages/setting/ChangeProductInfo.jsx";
+import OrderManagement from "./pages/order/OrderManagement.jsx"
 
 function App() {
-    return (
-        <Routes>
-            <Route path="/" element={<HomePage />} />
-
-            <Route
-                path="/login"
-                element={
-                    <RequireGuest>
-                        <Login />
-                    </RequireGuest>
-                }
-            />
-
-            <Route
-                path="/forgot-password"
-                element={
-                    <RequireGuest>
-                        <ForgotPassword />
-                    </RequireGuest>
-                }
-            />
-
-            <Route
-                path="/reset-password"
-                element={
-                    <RequireGuest>
-                        <ResetPassword />
-                    </RequireGuest>
-                }
-            />
-
-            <Route
-                path="/register"
-                element={
-                    <RequireGuest>
-                        <Register />
-                    </RequireGuest>
-                }
-            />
-
-            <Route
-                path="/setting"
-                element={
-                    <RequireAuth>
-                        <SettingLayout />
-                    </RequireAuth>
-                }
-            >
-                <Route index element={<SettingWelcome />} />
-                <Route path="updateProfile" element={<Updateprofile />} />
-                <Route path="profile" element={<GetProfile />} />
-                <Route path="dashboard/user" element={<DashboardUser />} />
-                <Route path="password" element={<Changepassword />} />
-            </Route>
-
-            <Route path="/admin/orders" element={<OrderManagement />} />
-        </Routes>
-    );
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route
+        path="/login"
+        element={
+          <RequireGuest>
+            <Login />
+          </RequireGuest>
+        }
+      />
+      <Route
+        path="/forgot-password"
+        element={
+          <RequireGuest>
+            <ForgotPassword />
+          </RequireGuest>
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          <RequireGuest>
+            <ResetPassword />
+          </RequireGuest>
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <RequireGuest>
+            <Register />
+          </RequireGuest>
+        }
+      />
+      <Route
+        path="/setting"
+        element={
+          <RequireAuth>
+            <SettingLayout />
+          </RequireAuth>
+        }
+      >
+        <Route index element={<SettingWelcome />} />
+        <Route path="updateProfile" element={<Updateprofile />} />
+        <Route path="profile" element={<GetProfile />} />
+        <Route path="dashboard/user" element={<DashboardUser />} />
+        <Route path="password" element={<Changepassword />} />
+        <Route path="dashboard/product" element={<ManageProduct />} />
+        <Route path="addProduct" element={<AddProduct />} />
+        <Route path="product-category/:id" element={<ProductCategory />} />
+        <Route path="change-product/:id" element={<ChangeProductInfo />} />
+      </Route>
+      <Route path="/" element={<HomePage />} />
+      <Route
+        path="/product/:id"
+        element={<ProductResults key={window.location.pathname} />}
+      />
+      <Route path="/search" element={<ProductResults />} />
+      <Route path="/category/:categoryId" element={<ProductResults />} />
+      <Route path="/addProduct" element={<AddProduct />} />
+      <Route
+        path="/setting/change-product/:id"
+        element={<ChangeProductInfo />}
+      />
+      <Route path="/admin/orders" element={<OrderManagement />} />
+    </Routes>
+  );
 }
 
 export default App;

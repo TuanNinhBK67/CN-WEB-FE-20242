@@ -1,0 +1,141 @@
+.product-management-wrapper {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: linear-gradient(to bottom, #dfe9f3, #ffffff);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.product-management-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  display: block;
+  margin: 0 auto 20px auto;
+  padding: 10px;
+  width: 50%;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button.active {
+  background-color: #28a745;
+}
+
+.product-table,
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.product-table th,
+.product-table td,
+.stock-table th,
+.stock-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.product-table th,
+.stock-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  margin: 0 5px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f8f9fa;
+  color: #333;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+.pagination button:hover {
+  background-color: #0056b3;
+  color: white;
+}
+
+.error {
+  color: red;
+  text-align: center;
+}
+
+.content-container {
+  display: flex;
+  gap: 20px;
+}
+
+.main-content {
+  flex: 1;
+}
+
+.form-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+
+  td {
+    padding: 8px 12px; /* Reduce padding for closer spacing */
+    vertical-align: middle;
+  }
+
+  label {
+    font-weight: bold;
+    display: block; /* Ensure consistent alignment */
+    margin-bottom: 5px; /* Add a small gap between label and input */
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Ensure consistent sizing */
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.add-product-form {
+  max-width: 600px; /* Limit the form width for better alignment */
+  margin: 0 auto; /* Center the form */
+}
