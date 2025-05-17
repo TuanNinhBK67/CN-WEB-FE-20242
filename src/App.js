@@ -1,3 +1,4 @@
+import logo from "./logo.svg";
 import "./App.scss";
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/user/Login.jsx";
@@ -12,13 +13,17 @@ import Changepassword from "./pages/setting/ChangePassword.jsx";
 import RequireGuest from "./components/RequireGuest.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import ForgotPassword from "./pages/user/ForgotPassword.jsx";
-import ResetPassword from "./pages/user/ResetPassword.jsx";
+import ResetPassword from "./pages/user/ForgotPassword.jsx";
 import ProductResults from "./pages/ProductResults";
 import ManageProduct from "./pages/setting/ManageProduct.jsx";
 import AddProduct from "./pages/setting/addProduct.jsx";
 import ProductCategory from "./pages/setting/ProductCategory.jsx";
 import ChangeProductInfo from "./pages/setting/ChangeProductInfo.jsx";
-import OrderManagement from "./pages/order/OrderManagement.jsx"
+import Checkout from './pages/Checkout.jsx';
+import PaymentSuccess from './pages/payment/PaymentSuccess.jsx';
+import PaymentFailed from './pages/payment/PaymentFailed.jsx';
+import PaymentHistory from './pages/setting/PaymentHistory.jsx';
+import OrderManagement from "./pages/order/OrderManagement.jsx";
 
 function App() {
   return (
@@ -68,24 +73,21 @@ function App() {
         <Route path="updateProfile" element={<Updateprofile />} />
         <Route path="profile" element={<GetProfile />} />
         <Route path="dashboard/user" element={<DashboardUser />} />
-        <Route path="password" element={<Changepassword />} />
+//        <Route path="password" element={<Changepassword />} />
+        <Route path="payments" element={<PaymentHistory />} />
         <Route path="dashboard/product" element={<ManageProduct />} />
         <Route path="addProduct" element={<AddProduct />} />
         <Route path="product-category/:id" element={<ProductCategory />} />
         <Route path="change-product/:id" element={<ChangeProductInfo />} />
       </Route>
-      <Route path="/" element={<HomePage />} />
-      <Route
-        path="/product/:id"
-        element={<ProductResults key={window.location.pathname} />}
-      />
+      <Route path="/checkout/:orderId?" element={<Checkout />} />
+      <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
+      <Route path="/payment/failed/:orderId" element={<PaymentFailed />} />
+      <Route path="/product/:id" element={<ProductResults key={window.location.pathname} />} />
       <Route path="/search" element={<ProductResults />} />
       <Route path="/category/:categoryId" element={<ProductResults />} />
       <Route path="/addProduct" element={<AddProduct />} />
-      <Route
-        path="/setting/change-product/:id"
-        element={<ChangeProductInfo />}
-      />
+      <Route path="/setting/change-product/:id" element={<ChangeProductInfo />} />
       <Route path="/admin/orders" element={<OrderManagement />} />
     </Routes>
   );
