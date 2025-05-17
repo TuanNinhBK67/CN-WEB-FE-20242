@@ -73,6 +73,7 @@ function App() {
         <Route path="addProduct" element={<AddProduct />} />
         <Route path="product-category/:id" element={<ProductCategory />} />
         <Route path="change-product/:id" element={<ChangeProductInfo />} />
+        <Route path="dashboard/orders" element={<OrderManagement/>}/>
       </Route>
       <Route path="/" element={<HomePage />} />
       <Route
@@ -86,7 +87,6 @@ function App() {
         path="/setting/change-product/:id"
         element={<ChangeProductInfo />}
       />
-      <Route path="/admin/orders" element={<OrderManagement />} />
     </Routes>
   );
 }
