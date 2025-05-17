@@ -45,6 +45,7 @@ const Updateprofile = () => {
 
     const navigate = useNavigate()
     const [err, setErr] = useState("");
+    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
 
     useEffect(()=> {
         const provinceArray = Object.entries(addressAPI).map(([provinceCode, provinceData]) =>({
@@ -141,9 +142,15 @@ const Updateprofile = () => {
         navigate("/");
     }
 
-    const handleSubmit = async(e) =>{
+    const handleConfirm = (e) => {
         e.preventDefault();
+        setShowConfirmPopup(true);
+    };
+
+    const handleSubmitConfirmed = async() =>{
+        setShowConfirmPopup(false);
         setErr("");
+
         const phoneRegex = /^\d{10}$/;
         if(!phoneRegex.test(formData.phone_number)){
             setErr("Số điện thoại không chính xác");
@@ -182,7 +189,7 @@ const Updateprofile = () => {
             <div className="update-wrapper">
                 <div className="update-card">
                     <h2 className="update-title">Cập nhật thông tin cá nhân</h2>
-                    <form onSubmit={handleSubmit} className="update-form">
+                    <form onSubmit={handleConfirm} className="update-form">
                         {err && <p className="error">{err}</p>}
 
                         <label htmlFor="username">Tên đăng nhập:</label>
@@ -305,6 +312,17 @@ const Updateprofile = () => {
                     </form>
                 </div>
             </div>
+            {showConfirmPopup && (
+            <div className="popup-confirm-overlay">
+                <div className="popup-confirm">
+                    <p>Bạn chắc chắn muốn cập nhật thông tin?</p>
+                    <div className="popup-buttons">
+                        <button onClick={() => setShowConfirmPopup(false)}>Hủy</button>
+                        <button onClick={handleSubmitConfirmed}>Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        )}
         </>
     )
 }

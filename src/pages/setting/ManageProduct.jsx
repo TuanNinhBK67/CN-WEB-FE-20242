@@ -21,11 +21,13 @@ const ManageProduct = () => {
 
   const productsPerPage = 10;
 
+  const API_URL = `${process.env.REACT_APP_API_URL}/api/products`
+
   useEffect(() => {
     const fetchStockProducts = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8080/api/products/stock/check"
+          `${API_URL}/stock/check`
         );
         setStockProducts(res.data);
       } catch (err) {
@@ -78,7 +80,7 @@ const ManageProduct = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/products/${id}`);
+      await axios.delete(`${API_URL}/${id}`);
       alert("Xóa sản phẩm thành công.");
       setStockProducts(stockProducts.filter((product) => product.id !== id));
     } catch (err) {
@@ -87,7 +89,7 @@ const ManageProduct = () => {
   };
 
   const handleCategory = (id) => {
-    navigate(`/api/products/${id}/category`);
+    navigate(`/setting/product-category/${id}`);
   };
 
   const filteredProducts = products.filter((product) =>
@@ -127,10 +129,14 @@ const ManageProduct = () => {
               <td>{product.stock}</td>
               <td>
                 <button onClick={() => handleDelete(product.id)}>Xóa</button>
-                <button onClick={() => handleCategory(product.id)}>
+                {/* <button onClick={() => handleCategory(product.id)}>
                   Phân loại
-                </button>
-                <button onClick={() => navigate("/ChangeProductInfo")}>
+                </button> */}
+                <button
+                  onClick={() =>
+                    navigate(`/setting/change-product/${product.id}`)
+                  }
+                >
                   Chỉnh sửa
                 </button>
               </td>

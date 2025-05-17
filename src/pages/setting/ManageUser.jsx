@@ -21,8 +21,14 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  const totalPages = Math.ceil(data.users.length / usersPerPage);
-  const currentUsers = data.users.slice(
+  // const currentId = Number(localStorage.getItem("userId"));
+  // const exceptUser = data.users.filter(u => u.id !== currentId);
+  const filterUser = data.users.filter(u => u.role !== 'admin');
+  const userActive = data.users.filter(u => u.role !== 'admin' && u.status === 'active')
+  const userBanned = data.users.filter(u => u.role !== 'admin' && u.status === 'banned')
+
+  const totalPages = Math.ceil(filterUser.length / usersPerPage);
+  const currentUsers = filterUser.slice(
     (currentPage - 1) * usersPerPage,
     currentPage * usersPerPage
   );
@@ -65,9 +71,9 @@ const UserManagement = () => {
       {error && <p className="error">{error}</p>}
 
       <div className="user-summary">
-        <span><LuUserCheck/> Đang hoạt động: {data.activeUser}</span>
-        <span><LuUserX/> Đã bị chặn: {data.bannedUser}</span>
-        <span><LuUsers/> Tổng người dùng: {data.users.length}</span>
+        <span><LuUserCheck/> Đang hoạt động: {userActive.length}</span>
+        <span><LuUserX/> Đã bị chặn: {userBanned.length}</span>
+        <span><LuUsers/> Tổng người dùng: {filterUser.length}</span>
       </div>
 
       <table className="user-table">
