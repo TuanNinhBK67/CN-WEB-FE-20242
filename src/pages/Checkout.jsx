@@ -60,7 +60,7 @@ const Checkout = () => {
       const user = JSON.parse(localStorage.getItem("user"));
 
       // Tạo giao dịch mới
-      const createResponse = await axios.post("/api/payments", {
+      const createResponse = await axios.post("/api/payments/create", {
         order_id: order.id,
         user_id: user.id,
         amount: order.total,

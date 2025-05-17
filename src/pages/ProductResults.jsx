@@ -102,6 +102,25 @@ const ProductResults = () => {
   const handleCategoryClick = (categoryId) => {
     navigate(`/category/${categoryId}`);
   };
+  
+  // Xử lý click vào BuyNow
+  const handleBuyNow = async () => {
+  if (!product) return;
+  const user = JSON.parse(localStorage.getItem("user"));
+  if (!user || !user.id) {
+    setAddCartMessage("Bạn cần đăng nhập để mua ngay!");
+    setTimeout(() => setAddCartMessage(""), 2000);
+    return;
+  }
+  try {
+    await addToCart(product.id, 1, user.id);
+    // TODO: Điều hướng đến trang thanh toán
+     navigate("/checkout"); 
+  } catch (err) {
+    setAddCartMessage("Mua ngay thất bại!");
+    setTimeout(() => setAddCartMessage(""), 2000);
+  }
+};
 
   // Xử lý thêm vào giỏ hàng
   const handleAddToCart = async () => {
@@ -364,7 +383,9 @@ const ProductResults = () => {
                   <button className="add-to-cart-button" onClick={handleAddToCart}>
                     Add to cart
                   </button>
-                  <button className="buy-now-button">Buy now</button>
+                  <button className="buy-now-button" onClick={handleBuyNow}>
+                    Buy now
+                    </button>
                   </>
                 )}
                 {storedUser?.role === "admin" && (
