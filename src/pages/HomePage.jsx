@@ -14,18 +14,25 @@ const HomePage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        try {
-            fetch(`${API_URL}/getAll`)
-                .then((res) => res.json())
-                .then(setProducts);
-            fetch(`${API_URL}/categories`)
-                .then((res) => res.json())
-                .then((data) => {
-					console.log("Fetched categories data:", data);
-                    setCategories(data.data || data);
-                });
-        } catch (error) {}
-    }, []);
+    try {
+        fetch(`${API_URL}/getAll`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log("Fetched products data:", data); // Debug dữ liệu
+                setProducts(Array.isArray(data) ? data : data.data || []); // Xử lý dữ liệu
+            });
+        fetch(`${API_URL}/categories`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log("Fetched categories data:", data);
+                setCategories(Array.isArray(data) ? data : data.data || []);
+            });
+    } catch (error) {
+        console.error("Fetch error:", error);
+        setProducts([]); // Đặt mặc định là mảng rỗng nếu lỗi
+        setCategories([]);
+    }
+}, []);
 
     const onSearch = (keyword) => {
         setSearchKeyword(keyword);
