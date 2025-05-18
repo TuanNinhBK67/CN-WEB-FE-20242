@@ -86,6 +86,7 @@ function App() {
       />
       <Route path="/search" element={<ProductResults />} />
       <Route path="/category/:categoryId" element={<ProductResults />} />
+      <Route path="/products/branch/:branchId" element={<ProductResults />} />
       <Route path="/addProduct" element={<AddProduct />} />
       <Route
         path="/setting/change-product/:id"
