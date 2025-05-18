@@ -18,7 +18,9 @@ import ManageProduct from "./pages/setting/ManageProduct.jsx";
 import AddProduct from "./pages/setting/addProduct.jsx";
 import ProductCategory from "./pages/setting/ProductCategory.jsx";
 import ChangeProductInfo from "./pages/setting/ChangeProductInfo.jsx";
-import OrderManagement from "./pages/order/OrderManagement.jsx"
+import OrderManagement from "./pages/order/OrderManagement.jsx";
+import AddCategory from "./pages/setting/AddCategory.jsx";
+import AddBrands from "./pages/setting/AddBrands.jsx";
 
 function App() {
   return (
@@ -71,9 +73,11 @@ function App() {
         <Route path="password" element={<Changepassword />} />
         <Route path="dashboard/product" element={<ManageProduct />} />
         <Route path="addProduct" element={<AddProduct />} />
+        <Route path="add-category" element={<AddCategory />} />
+        <Route path="add-brand" element={<AddBrands />} />
         <Route path="product-category/:id" element={<ProductCategory />} />
         <Route path="change-product/:id" element={<ChangeProductInfo />} />
-        <Route path="dashboard/orders" element={<OrderManagement/>}/>
+        <Route path="dashboard/orders" element={<OrderManagement />} />
       </Route>
       <Route path="/" element={<HomePage />} />
       <Route
