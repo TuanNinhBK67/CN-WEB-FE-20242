@@ -143,11 +143,11 @@ const Header = () => {
                 <FaUserCircle /> Xin chào {user.username}
               </span>
 
-              {user.role === "customer" && (
+              {/* {user.role === "customer" && (
                 <a href="/cart">
                   <FaShoppingCart /> Giỏ hàng
                 </a>
-              )}
+              )} */}
               <a href="/setting">
                 <IoSettings />
                 Cài đặt
@@ -233,18 +233,20 @@ const Header = () => {
             </button>
           </form>
         </div>
-        <div className="shop-cart" onClick={openCart}>
-          <FaShoppingCart size={20} />
-        </div>
+        {user?.role === "customer" && (
+          <div className="shop-cart" onClick={openCart}>
+            <FaShoppingCart size={20} />
+          </div>
+        )}
       </div>
-      <div className="shop-header__keywords">
+      {/* <div className="shop-header__keywords">
         <a href="#">Áo Thun Hot Trend 2024</a>
         <a href="#">Bánh Mix Nội Địa Trung</a>
         <a href="#">Giày Quai Hậu Nữ Đế Thấp</a>
         <a href="#">Điện Thoại 8plus Giá Rẻ 1k</a>
         <a href="#">Gấu Bông To Giá Rẻ</a>
         <a href="#">Kẹp Tóc 50 Cái</a>
-      </div>
+      </div> */}
 
       {isOpenCart && (
         <CartPopup

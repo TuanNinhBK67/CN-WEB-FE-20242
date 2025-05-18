@@ -263,7 +263,9 @@ const ProductResults = () => {
             {branchProducts.length > 0 ? (
               <>
                 <h1>
-                  Sản phẩm thuộc nhãn hàng:{" "}
+                  <span style={{ fontWeight: "600", fontSize: "24px", color: "#333" }}>
+                    Sản phẩm thuộc nhãn hàng:
+                  </span>{" "}
                   <span style={{ color: "#007bff" }}>{branchName}</span>
                 </h1>
                 <div className="product-grid-results" style={{ width: "100%" }}>
@@ -384,8 +386,10 @@ const ProductResults = () => {
             {categoryProducts.length > 0 ? (
               <>
                 <h1>
-                  Sản phẩm thuộc danh mục:{" "}
-                  <span style={{ color: "#007bff" }}>{categoryName}</span>
+                  <span style={{ fontWeight: "600", fontSize: "24px", color: "#333" }}>
+                    Sản phẩm thuộc danh mục:
+                  </span>{" "}
+                  <span style={{ color: "#007bff", fontWeight: "600" }}>{categoryName}</span>
                 </h1>
                 <div className="product-grid-results" style={{ width: "100%" }}>
                   {categoryProducts.map((product) => (
@@ -916,7 +920,7 @@ const ProductResults = () => {
                     >
                       Quản lý sản phẩm
                     </button>
-                    <button
+                    {/* <button
                       className="delete-button"
                       style={{
                         padding: "14px 28px",
@@ -939,7 +943,7 @@ const ProductResults = () => {
                       }
                     >
                       Xóa sản phẩm
-                    </button>
+                    </button> */}
                   </>
                 )}
               </div>

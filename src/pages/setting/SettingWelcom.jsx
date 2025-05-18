@@ -6,6 +6,7 @@ import { MdManageAccounts,MdOutlineProductionQuantityLimits, MdProductionQuantit
 import { TbLockPassword } from "react-icons/tb";
 import { IoIosLogOut } from "react-icons/io";
 import { BiPackage } from "react-icons/bi";
+import "../../assets/scss/setting/settingwelcom.scss"
 
 const SettingWelcome = () => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -13,11 +14,11 @@ const SettingWelcome = () => {
         <div>
             <h2>Chào mừng đến với Trung tâm Cài đặt</h2>
             <p>Hãy chọn một mục trong menu bên trái để thực hiện thao tác:</p>
-                <ul>
+                <ul className="setting-menu">
                     <li>Thông tin cá nhân <CgProfile/> </li>
                     <li>Cập nhật thông tin <GrUpdate/></li>
                     {user?.role === "customer" && (
-                        <li>Giỏ hàng <MdProductionQuantityLimits/></li>
+                        <li>Theo dõi đơn hàng <MdProductionQuantityLimits/></li>
                     )}
                     {
                         user?.role === "admin" && (
