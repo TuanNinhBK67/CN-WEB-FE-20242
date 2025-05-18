@@ -1,0 +1,16 @@
+ul.setting-menu {
+  list-style: none;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px; // khoảng cách giữa icon và chữ
+    padding: 8px 0;
+    font-size: 15px;
+
+    svg {
+      font-size: 18px;
+    }
+  }
+}
