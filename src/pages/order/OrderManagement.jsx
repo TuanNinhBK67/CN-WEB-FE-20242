@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react";
 import orderService from "../../services/orderService";
 import { getUserById } from "../../services/userService";
+import { getOrderHistory } from "../../services/cartService"
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
-    const [customer, setCustomer] = useState();
+    const user = JSON.parse(localStorage.getItem("user"));
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         async function fetchOrdersWithUserProfile() {
             try {
-                const response = await orderService.getAllOrders();
+                let response;
+                if (user.role == "customer"){
+                    response = await orderService.getAllOrders();
+                } else {
+                    response = await orderService.getAllOrders_admin();
+                }
                 const ordersData = response.data;
                 const ordersWithProfile = await Promise.all(
                     ordersData.map(async (order) => {
@@ -25,7 +31,7 @@ const OrderManagement = () => {
                 );
 
                 setOrders(ordersWithProfile);
-                console.log(ordersWithProfile);
+                console.log(ordersData);
             } catch (error) {
                 console.error("Lỗi khi lấy danh sách đơn hàng:", error);
             }

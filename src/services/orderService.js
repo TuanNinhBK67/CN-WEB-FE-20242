@@ -2,10 +2,21 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3000/api/orders"; // Thay bằng URL thực tế của backend
 
+const getUserId = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user.id) throw new Error("Chưa đăng nhập");
+    return user.id;
+};
+
 const orderService = {
+    getAllOrders_admin: () => {
+        return axios.get(`${API_URL}/getAll`);
+    },
+
     // Lấy danh sách tất cả đơn hàng
     getAllOrders: () => {
-        return axios.get(`${API_URL}`);
+        const user_id = getUserId()
+        return axios.get(`${API_URL}/${user_id}`);
     },
 
     // Lấy chi tiết đơn hàng theo ID

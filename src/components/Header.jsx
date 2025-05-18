@@ -61,7 +61,6 @@ const Header = () => {
   };
 
   const openCart = () => {
-    // navigate("/cart", { state: { background: location } });
     setShowOrderForm(false);
     setIsOpenCart(true);
   };

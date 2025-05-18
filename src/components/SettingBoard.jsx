@@ -19,7 +19,7 @@ const SidebarMenu = () => {
                 <li onClick={() => navigate("/setting/updateProfile")}>Cập nhật thông tin</li>
 
             {user?.role === "customer" && (
-                <li onClick={() => navigate("/setting/shoppingCart")}>Giỏ hàng</li>
+                <li onClick={() => navigate("/setting/dashboard/orders")}>Theo dõi đơn hàng</li>
             )}
             {
                 user?.role === "admin" && (
