@@ -1,3 +1,4 @@
+// /payment/success/:orderId
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { message } from "antd";
