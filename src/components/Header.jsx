@@ -198,11 +198,7 @@ const Header = () => {
                 />
             )}
 
-			{showOrderForm && (
-				<OrderForm></OrderForm>
-			)
-
-			}
+			{showOrderForm && <OrderForm onClose={() => setShowOrderForm(false)} />}
         </header>
     );
 };

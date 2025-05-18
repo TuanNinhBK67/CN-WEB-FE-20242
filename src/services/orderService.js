@@ -46,6 +46,11 @@ const orderService = {
             params: { shipper_id: shipperId },
         });
     },
+
+    //Tạo đơn hàng (đặt hàng)
+    createOrder: (orderData) => {
+        return axios.post(`${API_URL}/create`, orderData);
+    },
 };
 
 export default orderService;

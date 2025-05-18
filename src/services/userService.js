@@ -33,6 +33,17 @@ export const getProfile = async() => {
     );
 }
 
+export const getProfileById = async(user_id) => {
+    const token = localStorage.getItem("token");
+    return axios.get(`${API_URL}/getProfileById`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+    );
+}
+
 export const getAllUsers = async() => {
     const token = localStorage.getItem("token");
     return axios.get(`${API_URL}/getAllUser`,{

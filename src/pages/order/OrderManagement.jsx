@@ -1,20 +1,38 @@
 import React, { useState, useEffect } from "react";
 import orderService from "../../services/orderService";
+import { getProfileById } from "../../services/userService";
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
+    const [customer, setCustomer] = useState();
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        orderService
-            .getAllOrders()
-            .then((response) => {
-                console.log("Danh sách đơn hàng:", response.data);
-                setOrders(response.data)
-            })
-            .catch((error) => {
+        async function fetchOrdersWithUserProfile() {
+            try {
+                const response = await orderService.getAllOrders();
+                const ordersData = response.data;
+                const ordersWithProfile = await Promise.all(
+                    ordersData.map(async (order) => {
+                        if (!order.user_id) return order;
+
+                        const userProfile = await getProfileById(
+                            order.user_id
+                        );
+                        return {
+                            ...order,
+                            user_profile: userProfile.data, 
+                        };
+                    })
+                );
+
+                setOrders(ordersWithProfile);
+                console.log(ordersWithProfile)
+            } catch (error) {
                 console.error("Lỗi khi lấy danh sách đơn hàng:", error);
-            });
+            }
+        }
+        fetchOrdersWithUserProfile();
     }, []);
 
     const handleStatusChange = (id, newStatus) => {
@@ -49,7 +67,8 @@ const OrderManagement = () => {
     };
 
     const filteredOrders = orders.filter((order) =>
-        order.customer.toLowerCase().includes(searchTerm.toLowerCase())
+        // order.user_id.toLowerCase().includes(searchTerm.toLowerCase())
+        console.log(order.user_id)
     );
 
     return (
