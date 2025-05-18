@@ -86,6 +86,7 @@ const Header = () => {
 
   const handleCheckout = () => {
     alert("Chuyển đến trang thanh toán");
+    navigate('/order-listing');
   };
 
   const handleOrder = async () => {

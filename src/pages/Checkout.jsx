@@ -30,7 +30,9 @@ const Checkout = () => {
           return;
         }
 
-        const response = await axios.get(`/api/orders/${orderId}`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/orders/${orderId}`
+        );
         setOrder(response.data);
       } catch (error) {
         console.error("Error fetching order:", error);
@@ -59,23 +61,27 @@ const Checkout = () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
-      // Tạo giao dịch mới
-      const createResponse = await axios.post("/api/payments/create", {
-        order_id: order.id,
-        user_id: user.id,
-        amount: order.total,
-        payment_method: paymentMethod,
-      });
+      const createResponse = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/payments/create`,
+        {
+          order_id: order.id,
+          user_id: user.id,
+          amount: order.total,
+          payment_method: paymentMethod,
+        }
+      );
       if (!createResponse.data.success) {
         throw new Error("Không thể tạo giao dịch thanh toán");
       }
 
-      // Xử lý thanh toán
-      const response = await axios.post("/api/payments/process", {
-        order_id: order.id,
-        user_id: user.id,
-        payment_method: paymentMethod,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/payments/process`,
+        {
+          order_id: order.id,
+          user_id: user.id,
+          payment_method: paymentMethod,
+        }
+      );
 
       if (response.data.success) {
         navigate(`/payment/success/${order.id}`);
@@ -94,9 +100,12 @@ const Checkout = () => {
   const handleCancelPayment = async () => {
     try {
       setLoading(true);
-      const response = await axios.post("/api/payments/cancel", {
-        order_id: order.id,
-      });
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/api/payments/cancel`,
+        {
+          order_id: order.id,
+        }
+      );
       if (response.data.success) {
         message.success("Đã hủy thanh toán thành công");
         navigate("/setting/orders");

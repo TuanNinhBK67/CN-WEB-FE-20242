@@ -111,7 +111,7 @@ const ProductResults = () => {
   try {
     await addToCart(product.id, 1, user.id);
     // TODO: Điều hướng đến trang thanh toán
-     navigate("/checkout"); 
+     navigate("/order-listing"); 
   } catch (err) {
     setAddCartMessage("Mua ngay thất bại!");
     setTimeout(() => setAddCartMessage(""), 2000);
