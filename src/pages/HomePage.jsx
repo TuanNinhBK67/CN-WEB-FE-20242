@@ -15,7 +15,7 @@ const HomePage = () => {
 
     useEffect(() => {
         try {
-            fetch(`${API_URL}/getAll`)
+            fetch(`${API_URL}/`)
                 .then((res) => res.json())
                 .then(setProducts);
             fetch(`${API_URL}/categories`)
