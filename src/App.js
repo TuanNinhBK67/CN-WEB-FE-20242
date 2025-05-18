@@ -92,6 +92,7 @@ function App() {
       <Route path="/product/:id" element={<ProductResults key={window.location.pathname} />} />
       <Route path="/search" element={<ProductResults />} />
       <Route path="/category/:categoryId" element={<ProductResults />} />
+      <Route path="/products/branch/:branchId" element={<ProductResults />} />
       <Route path="/addProduct" element={<AddProduct />} />
       <Route path="/setting/change-product/:id" element={<ChangeProductInfo />} />
     </Routes>

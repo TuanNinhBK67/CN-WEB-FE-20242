@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import "../assets/scss/home.scss";
+import "../assets/scss/home/HomePage.scss";
 
 const API_URL = `${process.env.REACT_APP_API_URL}/api/products`;
 
@@ -15,6 +15,9 @@ const HomePage = () => {
   const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [fade, setFade] = useState(true);
+  const [slideDirection, setSlideDirection] = useState(""); // "left" | "right" | ""
+  const [branches, setBranches] = useState([]); // Thêm state branch
+  const [selectedBranch, setSelectedBranch] = useState(""); // Thêm state cho branch filter
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,10 +33,14 @@ const HomePage = () => {
         .then((data) => {
           setCategories(data.data || data);
         });
+      // Fetch branch
+      fetch(`${process.env.REACT_APP_API_URL}/api/products/branches`)
+        .then((res) => res.json())
+        .then((data) => setBranches(data.data || data));
     } catch (error) {}
   }, []);
 
-  // Fade effect for featured product
+  // Fade + slide effect for featured product
   useEffect(() => {
     setFade(false);
     const timeout = setTimeout(() => setFade(true), 50);
@@ -60,10 +67,16 @@ const HomePage = () => {
     setSelectedCategory(catId);
   };
 
-  // Lọc sản phẩm theo danh mục nếu có chọn
-  const filteredProducts = selectedCategory
-    ? products.filter((p) => String(p.category_id) === String(selectedCategory))
-    : products;
+  // Lọc sản phẩm theo danh mục và nhãn hàng nếu có chọn
+  const filteredProducts = products.filter((p) => {
+    const matchCategory = selectedCategory
+      ? String(p.category_id) === String(selectedCategory)
+      : true;
+    const matchBranch = selectedBranch
+      ? String(p.branch_id) === String(selectedBranch)
+      : true;
+    return matchCategory && matchBranch;
+  });
 
   // Loại bỏ các sản phẩm featured khỏi danh sách bên dưới
   const featuredIds = featuredProducts.map((p) => p.id);
@@ -78,17 +91,40 @@ const HomePage = () => {
 
   // Xử lý chuyển featured
   const handlePrevFeatured = () => {
-    setCurrentFeaturedIndex((prev) =>
-      prev === 0 ? featuredProducts.length - 1 : prev - 1
-    );
+    setSlideDirection("left");
+    setFade(false);
+    setTimeout(() => {
+      setCurrentFeaturedIndex((prev) =>
+        prev === 0 ? featuredProducts.length - 1 : prev - 1
+      );
+      setTimeout(() => setSlideDirection(""), 400);
+    }, 10);
   };
   const handleNextFeatured = () => {
-    setCurrentFeaturedIndex((prev) =>
-      prev === featuredProducts.length - 1 ? 0 : prev + 1
-    );
+    setSlideDirection("right");
+    setFade(false);
+    setTimeout(() => {
+      setCurrentFeaturedIndex((prev) =>
+        prev === featuredProducts.length - 1 ? 0 : prev + 1
+      );
+      setTimeout(() => setSlideDirection(""), 400);
+    }, 10);
   };
 
   const currentFeatured = featuredProducts[currentFeaturedIndex];
+
+  // Hàm lấy tên nhãn hàng từ branch_id
+  const getBranchName = (branch_id) => {
+    const found = branches.find((b) => String(b.id) === String(branch_id));
+    return found ? found.name : "";
+  };
+
+  // Handler khi click vào nhãn hàng
+  const handleBrandClick = (branch_id) => {
+    if (branch_id) {
+      navigate(`/products/branch/${branch_id}`);
+    }
+  };
 
   return (
     <div
@@ -100,7 +136,7 @@ const HomePage = () => {
     >
       <Header onSearch={onSearch} />
 
-      {/* Sản phẩm nổi bật - Carousel + Fade */}
+      {/* Sản phẩm nổi bật - Carousel + Fade + Slide */}
       {currentFeatured && (
         <section
           style={{
@@ -125,6 +161,9 @@ const HomePage = () => {
                 left: 24,
                 top: "50%",
                 transform: "translateY(-50%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 background: "rgba(0,0,0,0.15)",
                 border: "none",
                 borderRadius: "50%",
@@ -141,11 +180,21 @@ const HomePage = () => {
               onMouseOut={(e) => (e.currentTarget.style.opacity = 0.5)}
               aria-label="Trước"
             >
-              &#8592;
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                &#8592;
+              </span>
             </button>
           )}
 
-          {/* Ảnh sản phẩm featured chiếm full width + fade */}
+          {/* Ảnh sản phẩm featured chiếm full width + fade + slide */}
           <div
             style={{
               width: "100vw",
@@ -156,28 +205,51 @@ const HomePage = () => {
               position: "relative",
               minHeight: 420,
               gap: 0,
+              overflow: "hidden",
             }}
           >
-            <img
-              src={
-                currentFeatured.image_url ||
-                "https://via.placeholder.com/900x420"
-              }
-              alt={currentFeatured.name}
+            <div
               style={{
                 width: "100vw",
-                maxWidth: "100vw",
                 height: 420,
-                objectFit: "cover",
-                objectPosition: "center",
-                filter: "brightness(0.93)",
-                transition: "opacity 0.7s",
+                position: "absolute",
+                left: 0,
+                top: 0,
+                transition:
+                  "transform 0.5s cubic-bezier(.4,2,.6,1), opacity 0.7s",
+                transform: !fade
+                  ? slideDirection === "left"
+                    ? "translateX(60vw)"
+                    : slideDirection === "right"
+                    ? "translateX(-60vw)"
+                    : "translateX(0)"
+                  : "translateX(0)",
                 opacity: fade ? 1 : 0,
-                borderRadius: 0,
-                boxShadow: "0 4px 24px #ddd",
-                background: "#fff",
+                zIndex: 1,
               }}
-            />
+            >
+              <img
+                src={
+                  currentFeatured.image_url ||
+                  "https://via.placeholder.com/900x420"
+                }
+                alt={currentFeatured.name}
+                style={{
+                  width: "100vw",
+                  maxWidth: "100vw",
+                  height: 420,
+                  objectFit: "cover",
+                  objectPosition: "center",
+                  filter: "brightness(0.93)",
+                  borderRadius: 0,
+                  boxShadow: "0 4px 24px #ddd",
+                  background: "#fff",
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
+                draggable={false}
+              />
+            </div>
             {/* Overlay info */}
             <div
               style={{
@@ -195,8 +267,19 @@ const HomePage = () => {
                 flexDirection: "column",
                 alignItems: "flex-start",
                 zIndex: 2,
-                transition: "opacity 0.7s",
+                transition:
+                  "transform 0.5s cubic-bezier(.4,2,.6,1), opacity 0.7s",
                 opacity: fade ? 1 : 0,
+                // Slide overlay cùng hướng với ảnh
+                transform: `translateY(-50%) ${
+                  !fade
+                    ? slideDirection === "left"
+                      ? "translateX(60vw)"
+                      : slideDirection === "right"
+                      ? "translateX(-60vw)"
+                      : ""
+                    : ""
+                }`,
               }}
             >
               <h1
@@ -210,6 +293,24 @@ const HomePage = () => {
               >
                 {currentFeatured.name}
               </h1>
+              {/* Hiển thị nhãn hàng, có thể click */}
+              <div style={{ fontSize: 16, color: "#666", marginBottom: 8 }}>
+                Nhãn hàng:{" "}
+                <span
+                  style={{
+                    color: "#2575fc",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    textDecoration: "underline",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleBrandClick(currentFeatured.branch_id);
+                  }}
+                >
+                  {getBranchName(currentFeatured.branch_id)}
+                </span>
+              </div>
               <p
                 style={{
                   fontSize: 18,
@@ -294,6 +395,9 @@ const HomePage = () => {
                 right: 24,
                 top: "50%",
                 transform: "translateY(-50%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 background: "rgba(0,0,0,0.15)",
                 border: "none",
                 borderRadius: "50%",
@@ -310,10 +414,19 @@ const HomePage = () => {
               onMouseOut={(e) => (e.currentTarget.style.opacity = 0.5)}
               aria-label="Tiếp"
             >
-              &#8594;
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                &#8594;
+              </span>
             </button>
           )}
-          {/* Xoá gradient chuyển tiếp thừa, không render nữa */}
         </section>
       )}
 
@@ -418,6 +531,26 @@ const HomePage = () => {
                     >
                       {product.name}
                     </h3>
+                    {/* Hiển thị nhãn hàng, có thể click */}
+                    <div
+                      style={{ fontSize: 15, color: "#666", marginBottom: 6 }}
+                    >
+                      Nhãn hàng:{" "}
+                      <span
+                        style={{
+                          color: "#2575fc",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBrandClick(product.branch_id);
+                        }}
+                      >
+                        {getBranchName(product.branch_id)}
+                      </span>
+                    </div>
                     <div
                       style={{
                         fontSize: 18,
@@ -457,82 +590,137 @@ const HomePage = () => {
       )}
 
       {/* Dưới featured + sale: sidebar danh mục + danh sách sản phẩm */}
-      <main
-        className="homepage"
-        style={{
-          display: "flex",
-          gap: 24,
-          minHeight: 600,
-          flex: 1,
-          background: "#fff",
-          paddingTop: 32,
-        }}
-      >
-        {/* Sidebar danh mục */}
-        <aside
-          style={{
-            minWidth: 260,
-            background: "#fafbfc",
-            borderRadius: 12,
-            padding: 24,
-            boxShadow: "0 2px 8px #eee",
-            height: "fit-content",
-            color: "#222",
-          }}
-        >
+      <main className="homepage">
+        {/* Bảng filter mới */}
+        <aside>
           <h3
             style={{
+              marginBottom: 18,
+              fontSize: 22,
+              color: "#2575fc",
               fontWeight: 700,
-              marginBottom: 24,
-              textAlign: "center",
-              color: "#222",
             }}
           >
-            Danh mục sản phẩm
+            Bộ lọc sản phẩm
           </h3>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 18,
+              background: "linear-gradient(90deg, #f8fafc 60%, #e3e6f3 100%)",
+              borderRadius: 16,
+              padding: "24px 18px 18px 18px",
+              boxShadow: "0 2px 12px #e3e6f3",
+              marginBottom: 24,
+              alignItems: "stretch",
+              minWidth: 220,
+              maxWidth: 320,
+            }}
+          >
+            <label
               style={{
-                display: "block",
-                width: "100%",
-                marginBottom: 12,
-                padding: "10px 0",
-                border:
-                  selectedCategory === cat.id
-                    ? "2px solid #2575fc"
-                    : "1px solid #ddd",
-                borderRadius: 6,
-                background: selectedCategory === cat.id ? "#e3e6f3" : "#fff",
-                fontSize: 16,
-                cursor: "pointer",
-                transition: "background 0.2s",
-                color: "#222",
-                fontWeight: 500,
-              }}
-              onClick={() => handleCategoryClick(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
-          {selectedCategory && (
-            <button
-              style={{
-                marginTop: 8,
-                width: "100%",
-                background: "#fff",
-                border: "1px solid #aaa",
-                borderRadius: 6,
-                color: "#2575fc",
                 fontWeight: 600,
-                padding: "8px 0",
+                color: "#6a11cb",
+                marginBottom: 4,
+              }}
+            >
+              Danh mục
+            </label>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1.5px solid #2575fc",
+                fontSize: 16,
+                color: "#2575fc",
+                background: "#fff",
+                fontWeight: 600,
+                outline: "none",
+                boxShadow: selectedCategory ? "0 2px 8px #bdbdbd" : "none",
+                transition: "box-shadow 0.2s, border-color 0.2s",
                 cursor: "pointer",
               }}
-              onClick={() => setSelectedCategory("")}
+              onFocus={(e) => (e.target.style.borderColor = "#6a11cb")}
+              onBlur={(e) => (e.target.style.borderColor = "#2575fc")}
             >
-              Xoá lọc
-            </button>
-          )}
+              <option value="">Tất cả danh mục</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <label
+              style={{
+                fontWeight: 600,
+                color: "#6a11cb",
+                marginBottom: 4,
+                marginTop: 10,
+              }}
+            >
+              Nhãn hàng
+            </label>
+            <select
+              value={selectedBranch}
+              onChange={(e) => setSelectedBranch(e.target.value)}
+              style={{
+                padding: "10px 12px",
+                borderRadius: 8,
+                border: "1.5px solid #2575fc",
+                fontSize: 16,
+                color: "#2575fc",
+                background: "#fff",
+                fontWeight: 600,
+                outline: "none",
+                boxShadow: selectedBranch ? "0 2px 8px #bdbdbd" : "none",
+                transition: "box-shadow 0.2s, border-color 0.2s",
+                cursor: "pointer",
+              }}
+              onFocus={(e) => (e.target.style.borderColor = "#6a11cb")}
+              onBlur={(e) => (e.target.style.borderColor = "#2575fc")}
+            >
+              <option value="">Tất cả nhãn hàng</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+            {(selectedCategory || selectedBranch) && (
+              <button
+                className="remove-filter"
+                onClick={() => {
+                  setSelectedCategory("");
+                  setSelectedBranch("");
+                }}
+                style={{
+                  marginTop: 12,
+                  background: "linear-gradient(90deg, #e53935, #ff7675)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 0",
+                  fontWeight: 700,
+                  fontSize: 16,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px #e57373",
+                  transition: "background 0.2s",
+                }}
+                onMouseOver={(e) =>
+                  (e.currentTarget.style.background = "#e53935")
+                }
+                onMouseOut={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(90deg, #e53935, #ff7675)")
+                }
+              >
+                Xoá lọc
+              </button>
+            )}
+          </div>
         </aside>
         {/* Sản phẩm */}
         <section style={{ flex: 1, minHeight: "100vh", paddingBottom: 40 }}>
@@ -572,6 +760,19 @@ const HomePage = () => {
                         >
                           {product.name}
                         </h2>
+                        {/* Hiển thị nhãn hàng */}
+                        <div
+                          style={{
+                            fontSize: 15,
+                            color: "#666",
+                            marginBottom: 6,
+                          }}
+                        >
+                          Nhãn hàng:{" "}
+                          <span style={{ color: "#2575fc", fontWeight: 600 }}>
+                            {getBranchName(product.branch_id)}
+                          </span>
+                        </div>
                         <div className="product-price">
                           {Number(product.discount) > 0 ? (
                             <>
@@ -643,6 +844,26 @@ const HomePage = () => {
                       >
                         {product.name}
                       </h2>
+                      {/* Hiển thị nhãn hàng, có thể click */}
+                      <div
+                        style={{ fontSize: 15, color: "#666", marginBottom: 6 }}
+                      >
+                        Nhãn hàng:{" "}
+                        <span
+                          style={{
+                            color: "#2575fc",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBrandClick(product.branch_id);
+                          }}
+                        >
+                          {getBranchName(product.branch_id)}
+                        </span>
+                      </div>
                       <div className="product-price">
                         {Number(product.discount) > 0 ? (
                           <>
