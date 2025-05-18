@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api/orders";
+const API_URL = "http://localhost:8080/api/orders"; // Thay bằng URL thực tế của backend
 
 const orderService = {
     // Lấy danh sách tất cả đơn hàng

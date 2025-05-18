@@ -139,3 +139,60 @@ button.active {
   max-width: 600px; /* Limit the form width for better alignment */
   margin: 0 auto; /* Center the form */
 }
+
+.styled-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px #e0e7ef;
+}
+.styled-table td,
+.styled-table th {
+  padding: 16px 18px;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 16px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.styled-table tr:last-child td {
+  border-bottom: none;
+}
+.styled-table tr {
+  transition: box-shadow 0.2s, background 0.2s;
+}
+.styled-table tr:hover {
+  background: #f0f7ff;
+  box-shadow: 0 2px 8px #b3d1ff;
+  z-index: 1;
+  position: relative;
+}
+.styled-table td:focus-within,
+.styled-table td:active {
+  background: #e3f0ff;
+  outline: 2px solid #2575fc;
+  outline-offset: -2px;
+}
+.styled-table input,
+.styled-table select,
+.styled-table textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cfd8dc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.styled-table input:focus,
+.styled-table select:focus,
+.styled-table textarea:focus {
+  border: 1.5px solid #2575fc;
+  box-shadow: 0 0 0 2px #e3f0ff;
+  outline: none;
+}
+.styled-table label {
+  font-weight: 500;
+  color: #333;
+}
