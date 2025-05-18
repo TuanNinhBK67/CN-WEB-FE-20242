@@ -1,20 +1,36 @@
 import React, { useState, useEffect } from "react";
 import orderService from "../../services/orderService";
+import { getUserById } from "../../services/userService";
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
+    const [customer, setCustomer] = useState();
     const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        orderService
-            .getAllOrders()
-            .then((response) => {
-                console.log("Danh sách đơn hàng:", response.data);
-                setOrders(response.data)
-            })
-            .catch((error) => {
+        async function fetchOrdersWithUserProfile() {
+            try {
+                const response = await orderService.getAllOrders();
+                const ordersData = response.data;
+                const ordersWithProfile = await Promise.all(
+                    ordersData.map(async (order) => {
+                        if (!order.user_id) return order;
+
+                        const userProfile = await getUserById(order.user_id);
+                        return {
+                            ...order,
+                            user_profile: userProfile.data.user,
+                        };
+                    })
+                );
+
+                setOrders(ordersWithProfile);
+                console.log(ordersWithProfile);
+            } catch (error) {
                 console.error("Lỗi khi lấy danh sách đơn hàng:", error);
-            });
+            }
+        }
+        fetchOrdersWithUserProfile();
     }, []);
 
     const handleStatusChange = (id, newStatus) => {
@@ -49,7 +65,9 @@ const OrderManagement = () => {
     };
 
     const filteredOrders = orders.filter((order) =>
-        order.customer.toLowerCase().includes(searchTerm.toLowerCase())
+        order.user_profile?.full_name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -85,10 +103,22 @@ const OrderManagement = () => {
                         {filteredOrders.map((order) => (
                             <tr key={order.id} className="border-t">
                                 <td className="py-3 px-4">{order.id}</td>
-                                <td className="py-3 px-4">{order.customer}</td>
-                                <td className="py-3 px-4">{order.date}</td>
+                                {/* Hiển thị tên khách hàng từ user_profile */}
                                 <td className="py-3 px-4">
-                                    {order.total.toLocaleString()}đ
+                                    {order.user_profile?.full_name || "N/A"}
+                                </td>
+                                {/* Hiển thị ngày đặt từ createdAt */}
+                                <td className="py-3 px-4">
+                                    {new Date(
+                                        order.createdAt
+                                    ).toLocaleDateString()}
+                                </td>
+                                {/* Hiển thị tổng tiền từ total_amount */}
+                                <td className="py-3 px-4">
+                                    {Number(
+                                        order.total_amount
+                                    ).toLocaleString()}
+                                    đ
                                 </td>
                                 <td className="py-3 px-4">
                                     <span
@@ -111,6 +141,7 @@ const OrderManagement = () => {
                                     {order.shipper || "---"}
                                 </td>
                                 <td className="py-3 px-4 space-y-1">
+                                    {/* các button và select như cũ */}
                                     <div className="flex flex-wrap gap-2">
                                         <button
                                             className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded"

@@ -257,9 +257,9 @@ const Header = () => {
         />
       )}
 
-      {showOrderForm && <OrderForm></OrderForm>}
-    </header>
-  );
+			{showOrderForm && <OrderForm onClose={() => setShowOrderForm(false)} />}
+        </header>
+    );
 };
 
 export default Header;

@@ -170,11 +170,26 @@ const ProductResults = () => {
   const handleCategoryClick = (categoryId) => {
     navigate(`/category/${categoryId}`);
   };
-
-  // Thêm hàm xử lý click vào nhãn hàng
   const handleBrandClick = (branchId) => {
     if (branchId) {
       navigate(`/products/branch/${branchId}`);
+    }
+  };
+  const handleBuyNow = async () => {
+    if (!product) return;
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user || !user.id) {
+      setAddCartMessage("Bạn cần đăng nhập để mua ngay!");
+      setTimeout(() => setAddCartMessage(""), 2000);
+      return;
+    }
+    try {
+      await addToCart(product.id, 1, user.id);
+      // TODO: Điều hướng đến trang thanh toán
+      navigate("/checkout");
+    } catch (err) {
+      setAddCartMessage("Mua ngay thất bại!");
+      setTimeout(() => setAddCartMessage(""), 2000);
     }
   };
 
@@ -227,143 +242,11 @@ const ProductResults = () => {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        background: "#f5f7fa",
       }}
     >
       <Header onSearch={onSearch} />
-      <main
-        className="product-details"
-        style={{
-          flex: 1,
-          width: "100vw",
-          maxWidth: "100vw",
-          minWidth: 0,
-          padding: 0,
-          margin: 0,
-        }}
-      >
-        {branchId ? (
-          <>
-            {branchProducts.length > 0 ? (
-              <>
-                <h1>
-                  Sản phẩm thuộc nhãn hàng:{" "}
-                  <span style={{ color: "#007bff" }}>{branchName}</span>
-                </h1>
-                <div className="product-grid-results" style={{ width: "100%" }}>
-                  {branchProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className="product-card"
-                      onClick={() => handleCardClick(product)}
-                    >
-                      <img
-                        src={
-                          product.image_url || "https://via.placeholder.com/150"
-                        }
-                        alt={product.name}
-                        className="product-image"
-                      />
-                      <div className="product-info">
-                        <h2 className="product-title">{product.name}</h2>
-                        {/* Thông tin danh mục và nhãn hàng */}
-                        <div
-                          style={{
-                            fontSize: 15,
-                            color: "#666",
-                            marginBottom: 6,
-                          }}
-                        >
-                          Danh mục:{" "}
-                          {product.category_id ? (
-                            <span
-                              style={{
-                                color: "#2575fc",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                textDecoration: "underline",
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCategoryClick(product.category_id);
-                              }}
-                            >
-                              {getCategoryNameById(product.category_id)}
-                            </span>
-                          ) : (
-                            <span style={{ color: "#aaa" }}>Không có</span>
-                          )}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            color: "#666",
-                            marginBottom: 6,
-                          }}
-                        >
-                          Nhãn hàng:{" "}
-                          {product.branch_id ? (
-                            <span
-                              style={{
-                                color: "#2575fc",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                textDecoration: "underline",
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBrandClick(product.branch_id);
-                              }}
-                            >
-                              {getBranchName(product.branch_id) ||
-                                "Đang tải..."}
-                            </span>
-                          ) : (
-                            <span style={{ color: "#aaa" }}>Không có</span>
-                          )}
-                        </div>
-                        <p className="product-description">
-                          {product.description}
-                        </p>
-                        <div className="product-price">
-                          {Number(product.discount) > 0 ? (
-                            <>
-                              <span className="price-original">
-                                {Number(product.price).toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
-                              </span>
-                              <span className="price-discounted">
-                                {Number(
-                                  product.price * (1 - product.discount / 100)
-                                ).toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="price-discounted">
-                                {Number(product.price).toLocaleString("vi-VN", {
-                                  style: "currency",
-                                  currency: "VND",
-                                })}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <p>Không có sản phẩm nào trong nhãn hàng này.</p>
-            )}
-          </>
-        ) : categoryId ? (
+      <main className="product-details" style={{ flex: 1 }}>
+        {categoryId ? (
           <>
             {categoryProducts.length > 0 ? (
               <>
@@ -371,7 +254,7 @@ const ProductResults = () => {
                   Sản phẩm thuộc danh mục:{" "}
                   <span style={{ color: "#007bff" }}>{categoryName}</span>
                 </h1>
-                <div className="product-grid-results" style={{ width: "100%" }}>
+                <div className="product-grid">
                   {categoryProducts.map((product) => (
                     <div
                       key={product.id}
@@ -387,62 +270,6 @@ const ProductResults = () => {
                       />
                       <div className="product-info">
                         <h2 className="product-title">{product.name}</h2>
-                        {/* Thông tin danh mục và nhãn hàng */}
-                        <div
-                          style={{
-                            fontSize: 15,
-                            color: "#666",
-                            marginBottom: 6,
-                          }}
-                        >
-                          Danh mục:{" "}
-                          {product.category_id ? (
-                            <span
-                              style={{
-                                color: "#2575fc",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                textDecoration: "underline",
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleCategoryClick(product.category_id);
-                              }}
-                            >
-                              {getCategoryNameById(product.category_id)}
-                            </span>
-                          ) : (
-                            <span style={{ color: "#aaa" }}>Không có</span>
-                          )}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            color: "#666",
-                            marginBottom: 6,
-                          }}
-                        >
-                          Nhãn hàng:{" "}
-                          {product.branch_id ? (
-                            <span
-                              style={{
-                                color: "#2575fc",
-                                fontWeight: 600,
-                                cursor: "pointer",
-                                textDecoration: "underline",
-                              }}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBrandClick(product.branch_id);
-                              }}
-                            >
-                              {getBranchName(product.branch_id) ||
-                                "Đang tải..."}
-                            </span>
-                          ) : (
-                            <span style={{ color: "#aaa" }}>Không có</span>
-                          )}
-                        </div>
                         <p className="product-description">
                           {product.description}
                         </p>
@@ -488,7 +315,7 @@ const ProductResults = () => {
           <>
             <h1>Kết quả tìm kiếm cho "{searchKeyword}"</h1>
             {searchResults.length > 0 ? (
-              <div className="product-grid-results" style={{ width: "100%" }}>
+              <div className="product-grid">
                 {searchResults.map((product) => (
                   <div
                     key={product.id}
@@ -504,53 +331,6 @@ const ProductResults = () => {
                     />
                     <div className="product-info">
                       <h2 className="product-title">{product.name}</h2>
-                      {/* Thông tin danh mục và nhãn hàng */}
-                      <div
-                        style={{ fontSize: 15, color: "#666", marginBottom: 6 }}
-                      >
-                        Danh mục:{" "}
-                        {product.category_id ? (
-                          <span
-                            style={{
-                              color: "#2575fc",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              textDecoration: "underline",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCategoryClick(product.category_id);
-                            }}
-                          >
-                            {getCategoryNameById(product.category_id)}
-                          </span>
-                        ) : (
-                          <span style={{ color: "#aaa" }}>Không có</span>
-                        )}
-                      </div>
-                      <div
-                        style={{ fontSize: 15, color: "#666", marginBottom: 6 }}
-                      >
-                        Nhãn hàng:{" "}
-                        {product.branch_id ? (
-                          <span
-                            style={{
-                              color: "#2575fc",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              textDecoration: "underline",
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleBrandClick(product.branch_id);
-                            }}
-                          >
-                            {getBranchName(product.branch_id) || "Đang tải..."}
-                          </span>
-                        ) : (
-                          <span style={{ color: "#aaa" }}>Không có</span>
-                        )}
-                      </div>
                       <p className="product-description">
                         {product.description}
                       </p>
@@ -592,93 +372,20 @@ const ProductResults = () => {
             )}
           </>
         ) : product ? (
-          <div
-            className="product-details-container"
-            style={{
-              gap: 48,
-              alignItems: "flex-start",
-              maxWidth: 1100,
-              margin: "36px auto 0 auto",
-              background: "#fff",
-              borderRadius: 18,
-              boxShadow: "0 4px 32px #e3e6f3",
-              padding: "40px 44px 36px 44px",
-              display: "flex",
-              flexWrap: "wrap",
-            }}
-          >
-            <div
-              className="product-image-section"
-              style={{
-                flex: "0 0 400px",
-                maxWidth: 400,
-                minWidth: 320,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
-            >
-              <div
-                style={{
-                  width: 360,
-                  height: 360,
-                  background: "#f8fafc",
-                  borderRadius: 18,
-                  boxShadow: "0 2px 16px #e0e0e0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                  marginBottom: 18,
-                  border: "1.5px solid #e3e6f3",
-                }}
-              >
-                <img
-                  src={product.image_url || "https://via.placeholder.com/340"}
-                  alt={product.name}
-                  className="product-image"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    borderRadius: 14,
-                    background: "#fff",
-                  }}
-                />
-              </div>
+          <div className="product-details-container">
+            <div className="product-image-section">
+              <img
+                src={product.image_url || "https://via.placeholder.com/150"}
+                alt={product.name}
+                className="product-image"
+              />
             </div>
-            <div
-              className="product-info-section"
-              style={{
-                flex: 2,
-                minWidth: 320,
-                maxWidth: 600,
-                paddingLeft: 12,
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "flex-start",
-              }}
-            >
-              <h1
-                className="product-title"
-                style={{
-                  fontSize: 36,
-                  fontWeight: 800,
-                  color: "#2575fc",
-                  marginBottom: 18,
-                  lineHeight: 1.1,
-                  letterSpacing: 0.5,
-                }}
-              >
-                {product.name}
-              </h1>
+            <div className="product-info-section">
+              <h1 className="product-title">{product.name}</h1>
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 8,
-                  marginBottom: 18,
                 }}
               >
                 {Number(product.discount) > 0 ? (
@@ -687,8 +394,7 @@ const ProductResults = () => {
                       style={{
                         textDecoration: "line-through",
                         color: "#888",
-                        fontSize: "1.1rem",
-                        marginBottom: 2,
+                        fontSize: "0.9rem",
                       }}
                     >
                       {Number(product.price).toLocaleString("vi-VN", {
@@ -698,10 +404,9 @@ const ProductResults = () => {
                     </span>
                     <span
                       style={{
-                        color: "#e53935",
+                        color: "red",
                         fontWeight: "bold",
-                        fontSize: "2rem",
-                        letterSpacing: 1,
+                        fontSize: "1.1rem",
                       }}
                     >
                       {Number(
@@ -713,107 +418,57 @@ const ProductResults = () => {
                     </span>
                   </>
                 ) : (
-                  <span
-                    style={{
-                      color: "#e53935",
-                      fontWeight: "bold",
-                      fontSize: "2rem",
-                      letterSpacing: 1,
-                    }}
-                  >
-                    {Number(product.price).toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
+                  <>
+                    <span
+                      style={{
+                        color: "red",
+                        fontWeight: "bold",
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {Number(product.price).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                  </>
                 )}
               </div>
-              <div style={{ margin: "10px 0 18px 0", fontSize: 17 }}>
-                <span>
-                  <strong>Danh mục:</strong>{" "}
-                  {product.category_id ? (
-                    <span
-                      style={{
-                        color: "#2575fc",
-                        cursor: "pointer",
-                        textDecoration: "underline",
-                        fontWeight: 600,
-                        transition: "color 0.2s",
-                      }}
-                      onClick={() => handleCategoryClick(product.category_id)}
-                      onMouseOver={(e) => (e.target.style.color = "#6a11cb")}
-                      onMouseOut={(e) => (e.target.style.color = "#2575fc")}
-                    >
-                      {getCategoryNameById(product.category_id)}
-                    </span>
-                  ) : (
-                    <span style={{ color: "#aaa" }}>Không có</span>
-                  )}
-                </span>
-                <span style={{ marginLeft: 32 }}>
-                  <strong>Nhãn hàng:</strong>{" "}
-                  {product.branch_id ? (
-                    <span
-                      style={{
-                        color: "#2575fc",
-                        cursor: "pointer",
-                        textDecoration: "underline",
-                        fontWeight: 600,
-                        transition: "color 0.2s",
-                      }}
-                      onClick={() => handleBrandClick(product.branch_id)}
-                      onMouseOver={(e) => (e.target.style.color = "#6a11cb")}
-                      onMouseOut={(e) => (e.target.style.color = "#2575fc")}
-                    >
-                      {getBranchName(product.branch_id) || "Đang tải..."}
-                    </span>
-                  ) : (
-                    <span style={{ color: "#aaa" }}>Không có</span>
-                  )}
-                </span>
-              </div>
-              <p
-                className="product-description"
-                style={{
-                  fontSize: 17,
-                  color: "#444",
-                  marginBottom: 22,
-                  lineHeight: 1.6,
-                  background: "#f8fafc",
-                  borderRadius: 8,
-                  padding: "16px 18px",
-                  boxShadow: "0 1px 4px #e3e6f3",
-                  minHeight: 60,
-                }}
-              >
-                {product.description}
+              {/* Hiển thị danh mục sản phẩm có thể click */}
+              <p className="product-category">
+                <strong>Danh mục:</strong>{" "}
+                {category ? (
+                  <span
+                    style={{
+                      color: "#007bff",
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                    }}
+                    onClick={() => handleCategoryClick(category.id)}
+                  >
+                    {category.name}
+                  </span>
+                ) : (
+                  "Không có danh mục"
+                )}
               </p>
-              <div
-                className="product-actions"
-                style={{ marginTop: 18, gap: 18 }}
-              >
+              <p className="product-description">{product.description}</p>
+              <div className="product-actions">
                 {!storedUser && (
                   <button
                     style={{
-                      padding: "14px 28px",
-                      background: "linear-gradient(90deg, #6a11cb, #2575fc)",
+                      padding: "12px 20px",
+                      backgroundColor: "#6c63ff",
                       color: "#fff",
                       border: "none",
                       borderRadius: "8px",
-                      fontSize: "18px",
+                      fontSize: "16px",
                       fontWeight: "bold",
                       cursor: "pointer",
-                      boxShadow: "0 2px 8px #bdbdbd",
-                      transition: "background 0.2s, transform 0.18s",
+                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      transition: "background 0.3s",
                     }}
                     onClick={() => navigate("/login")}
-                    onMouseOver={(e) =>
-                      (e.currentTarget.style.background = "#2575fc")
-                    }
-                    onMouseOut={(e) =>
-                      (e.currentTarget.style.background =
-                        "linear-gradient(90deg, #6a11cb, #2575fc)")
-                    }
                   >
                     Đăng nhập để mua sắm
                   </button>
@@ -822,120 +477,29 @@ const ProductResults = () => {
                   <>
                     <button
                       className="add-to-cart-button"
-                      style={{
-                        padding: "14px 28px",
-                        background: "linear-gradient(90deg, #43cea2, #185a9d)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 8px #bdbdbd",
-                        transition: "background 0.2s, transform 0.18s",
-                      }}
                       onClick={handleAddToCart}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#185a9d")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(90deg, #43cea2, #185a9d)")
-                      }
                     >
                       Thêm vào giỏ hàng
                     </button>
-                    <button
-                      className="buy-now-button"
-                      style={{
-                        padding: "14px 28px",
-                        background: "linear-gradient(90deg, #e53935, #ff7675)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 8px #e57373",
-                        transition: "background 0.2s, transform 0.18s",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#e53935")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(90deg, #e53935, #ff7675)")
-                      }
-                    >
-                      Mua ngay
-                    </button>
+                    <button className="buy-now-button">Mua</button>
                   </>
                 )}
                 {storedUser?.role === "admin" && (
                   <>
                     <button
                       className="manage-button"
-                      style={{
-                        padding: "14px 28px",
-                        background: "linear-gradient(90deg, #6a11cb, #2575fc)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 8px #bdbdbd",
-                        transition: "background 0.2s, transform 0.18s",
-                      }}
                       onClick={() =>
                         navigate(`/setting/change-product/${product.id}`)
-                      }
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#2575fc")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(90deg, #6a11cb, #2575fc)")
                       }
                     >
                       Quản lý sản phẩm
                     </button>
-                    <button
-                      className="delete-button"
-                      style={{
-                        padding: "14px 28px",
-                        background: "linear-gradient(90deg, #e53935, #ff7675)",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "8px",
-                        fontSize: "18px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 8px #e57373",
-                        transition: "background 0.2s, transform 0.18s",
-                      }}
-                      onMouseOver={(e) =>
-                        (e.currentTarget.style.background = "#e53935")
-                      }
-                      onMouseOut={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(90deg, #e53935, #ff7675)")
-                      }
-                    >
-                      Xóa sản phẩm
-                    </button>
+                    <button className="delete-button">Xóa sản phẩm</button>
                   </>
                 )}
               </div>
               {addCartMessage && (
-                <div
-                  style={{
-                    color: "green",
-                    marginTop: 18,
-                    fontWeight: 600,
-                    fontSize: 16,
-                  }}
-                >
+                <div style={{ color: "green", marginTop: 10 }}>
                   {addCartMessage}
                 </div>
               )}
@@ -943,142 +507,6 @@ const ProductResults = () => {
           </div>
         ) : (
           <p>Đang tải thông tin sản phẩm...</p>
-        )}
-
-        {/* Gợi ý sản phẩm cùng danh mục */}
-        {product && relatedProducts.length > 0 && (
-          <div
-            style={{
-              margin: "48px 0 0 0",
-              background: "linear-gradient(90deg, #f8fafc 60%, #e3e6f3 100%)",
-              borderRadius: 18,
-              boxShadow: "0 2px 16px #e3e6f3",
-              padding: "36px 0 36px 0",
-              maxWidth: 1200,
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-          >
-            <h2
-              style={{
-                fontSize: 24,
-                fontWeight: 800,
-                color: "#2575fc",
-                marginBottom: 24,
-                marginLeft: 44,
-                letterSpacing: 0.5,
-              }}
-            >
-              Bạn cũng có thể thích
-            </h2>
-            <div
-              className="product-grid-results"
-              style={{ width: "100%", padding: "0 44px" }}
-            >
-              {relatedProducts.map((item) => (
-                <div
-                  key={item.id}
-                  className="product-card"
-                  onClick={() => navigate(`/product/${item.id}`)}
-                  style={{
-                    cursor: "pointer",
-                    transition: "transform 0.18s, box-shadow 0.18s",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = "scale(1.04)";
-                    e.currentTarget.style.boxShadow = "0 8px 32px #bdbdbd";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                    e.currentTarget.style.boxShadow = "0 2px 12px #e0e0e0";
-                  }}
-                >
-                  <img
-                    src={item.image_url || "https://via.placeholder.com/150"}
-                    alt={item.name}
-                    className="product-image"
-                  />
-                  <div className="product-info">
-                    <h2 className="product-title">{item.name}</h2>
-                    <div
-                      style={{ fontSize: 15, color: "#666", marginBottom: 6 }}
-                    >
-                      Danh mục:{" "}
-                      {item.category_id ? (
-                        <span
-                          style={{
-                            color: "#2575fc",
-                            fontWeight: 600,
-                            cursor: "pointer",
-                            textDecoration: "underline",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCategoryClick(item.category_id);
-                          }}
-                        >
-                          {getCategoryNameById(item.category_id)}
-                        </span>
-                      ) : (
-                        <span style={{ color: "#aaa" }}>Không có</span>
-                      )}
-                    </div>
-                    <div
-                      style={{ fontSize: 15, color: "#666", marginBottom: 6 }}
-                    >
-                      Nhãn hàng:{" "}
-                      {item.branch_id ? (
-                        <span
-                          style={{
-                            color: "#2575fc",
-                            fontWeight: 600,
-                            cursor: "pointer",
-                            textDecoration: "underline",
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBrandClick(item.branch_id);
-                          }}
-                        >
-                          {getBranchName(item.branch_id) || "Đang tải..."}
-                        </span>
-                      ) : (
-                        <span style={{ color: "#aaa" }}>Không có</span>
-                      )}
-                    </div>
-                    <p className="product-description">{item.description}</p>
-                    <div className="product-price">
-                      {Number(item.discount) > 0 ? (
-                        <>
-                          <span className="price-original">
-                            {Number(item.price).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                          </span>
-                          <span className="price-discounted">
-                            {Number(
-                              item.price * (1 - item.discount / 100)
-                            ).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="price-discounted">
-                          {Number(item.price).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         )}
       </main>
       <Footer />
