@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import orderService from "../../services/orderService";
 import { getUserById } from "../../services/userService";
-import { getOrderHistory } from "../../services/cartService"
+
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
@@ -47,7 +47,7 @@ const OrderManagement = () => {
         );
     };
 
-    const handleAssignShipper = (id) => {
+    const handleAssignShipper = async (id) => {
         const name = prompt("Nhập tên shipper:");
         if (name) {
             setOrders((prev) =>
