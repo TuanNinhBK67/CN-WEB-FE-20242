@@ -21,14 +21,12 @@ const ManageProduct = () => {
 
   const productsPerPage = 10;
 
-  const API_URL = `${process.env.REACT_APP_API_URL}/api/products`
+  const API_URL = `${process.env.REACT_APP_API_URL}/api/products`;
 
   useEffect(() => {
     const fetchStockProducts = async () => {
       try {
-        const res = await axios.get(
-          `${API_URL}/stock/check`
-        );
+        const res = await axios.get(`${API_URL}/stock/check`);
         setStockProducts(res.data);
       } catch (err) {
         setError("Không thể tải danh sách tồn kho sản phẩm.");
@@ -111,6 +109,12 @@ const ManageProduct = () => {
       />
 
       <button onClick={() => navigate("/addProduct")}>Thêm sản phẩm</button>
+      <button onClick={() => navigate("/setting/add-category")}>
+        Thêm danh mục
+      </button>
+      <button onClick={() => navigate("/setting/add-brand")}>
+        Thêm nhãn hàng
+      </button>
 
       <table className="stock-table">
         <thead>

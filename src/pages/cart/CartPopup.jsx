@@ -1,4 +1,3 @@
-
 import { FaTimes } from "react-icons/fa";
 
 const CartPopup = ({
@@ -9,10 +8,10 @@ const CartPopup = ({
     onCheckout,
     onOrder,
 }) => {
-    const total = items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-    );
+    const total = items.reduce((sum, item) => {
+        const price = parseFloat(item.product?.price || 0);
+        return sum + price * item.quantity;
+    }, 0);
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center">
@@ -30,46 +29,57 @@ const CartPopup = ({
                     {items.length === 0 ? (
                         <p>Chưa có sản phẩm nào.</p>
                     ) : (
-                        items.map((item) => (
-                            <div
-                                key={item.id}
-                                className="flex justify-between items-center border-b pb-2"
-                            >
-                                <div>
-                                    <p className="font-semibold">{item.name}</p>
-                                    <p>Giá: {item.price.toLocaleString()}₫</p>
-                                    <div className="flex items-center">
-                                        <span className="mr-2">Số lượng:</span>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={item.quantity}
-                                            onChange={(e) =>
-                                                onQuantityChange(
-                                                    item.id,
-                                                    Number(e.target.value)
-                                                )
+                        items.map((item) => {
+                            const product = item.product || {};
+                            const price = parseFloat(product.price || 0);
+
+                            return (
+                                <div
+                                    key={item.product_id}
+                                    className="flex justify-between items-center border-b pb-2"
+                                >
+                                    <div>
+                                        <p className="font-semibold">
+                                            {product.name}
+                                        </p>
+                                        <p>Giá: {price.toLocaleString()}₫</p>
+                                        <div className="flex items-center">
+                                            <span className="mr-2">
+                                                Số lượng:
+                                            </span>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={item.quantity}
+                                                onChange={(e) =>
+                                                    onQuantityChange(
+                                                        item.product_id,
+                                                        Number(e.target.value)
+                                                    )
+                                                }
+                                                className="w-16 px-2 py-1 border rounded text-black"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p>
+                                            {(
+                                                price * item.quantity
+                                            ).toLocaleString()}
+                                            ₫
+                                        </p>
+                                        <button
+                                            onClick={() =>
+                                                onRemove(item.product_id)
                                             }
-                                            className="w-16 px-2 py-1 border rounded text-black"
-                                        />
+                                            className="text-red-500 hover:underline text-sm font-bold"
+                                        >
+                                            Xoá
+                                        </button>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <p>
-                                        {(
-                                            item.price * item.quantity
-                                        ).toLocaleString()}
-                                        ₫
-                                    </p>
-                                    <button
-                                        onClick={() => onRemove(item.id)}
-                                        className="text-red-500 hover:underline text-sm font-bold"
-                                    >
-                                        Xoá
-                                    </button>
-                                </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
 

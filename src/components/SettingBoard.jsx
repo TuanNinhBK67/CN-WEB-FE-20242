@@ -26,7 +26,7 @@ const SidebarMenu = () => {
                     <>
                         <li onClick={() => navigate("/setting/dashboard/user")}>Quản lý người dùng</li>
                         <li onClick={() => navigate("/setting/dashboard/product")}>Quản lý sản phẩm</li>
-                        <li onClick={() => navigate("/setting/dashboard/order")}>Quản lý đơn hàng</li>
+                        <li onClick={() => navigate("/setting/dashboard/orders")}>Quản lý đơn hàng</li>
                     </>
                 )
             }

@@ -23,6 +23,8 @@ const ChangeProductInfo = () => {
 
   // Thêm state cho danh mục
   const [categories, setCategories] = useState([]);
+  // Thêm state cho nhãn hàng
+  const [branches, setBranches] = useState([]);
   // Thêm state cho form thêm danh mục
   const [newCategory, setNewCategory] = useState({ name: "", description: "" });
   const [catMsg, setCatMsg] = useState("");
@@ -65,6 +67,21 @@ const ChangeProductInfo = () => {
       }
     };
     fetchCategories();
+  }, []);
+
+  // Lấy danh sách nhãn hàng
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:8080/api/products/branches"
+        );
+        setBranches(res.data.data || res.data);
+      } catch {
+        setBranches([]);
+      }
+    };
+    fetchBranches();
   }, []);
 
   const handleChange = (e) => {
@@ -153,7 +170,7 @@ const ChangeProductInfo = () => {
               <p>Đang tải thông tin sản phẩm...</p>
             ) : (
               <form onSubmit={handleSubmit} className="add-product-form">
-                <table className="form-table">
+                <table className="form-table styled-table">
                   <tbody>
                     <tr>
                       <td>
@@ -244,17 +261,24 @@ const ChangeProductInfo = () => {
                     </tr>
                     <tr>
                       <td>
-                        <label htmlFor="branch_id">ID Nhãn hàng</label>
+                        <label htmlFor="branch_id">Nhãn hàng</label>
                       </td>
                       <td>
-                        <input
-                          type="number"
+                        <select
                           id="branch_id"
                           name="branch_id"
                           value={formData.branch_id}
                           onChange={handleChange}
                           required
-                        />
+                          style={{ minWidth: 120 }}
+                        >
+                          <option value="">-- Chọn nhãn hàng --</option>
+                          {branches.map((b) => (
+                            <option key={b.id} value={b.id}>
+                              {b.name}
+                            </option>
+                          ))}
+                        </select>
                       </td>
                     </tr>
                     <tr>
@@ -326,125 +350,6 @@ const ChangeProductInfo = () => {
                 </button>
               </form>
             )}
-          </div>
-          {/* Bảng danh mục bên phải */}
-          <div
-            className="category-list-panel"
-            style={{
-              flex: 1,
-              background: "#f8f9fa",
-              borderRadius: 8,
-              padding: 16,
-              minWidth: 220,
-            }}
-          >
-            <h3 style={{ marginBottom: 12 }}>Danh sách danh mục</h3>
-            <table
-              style={{
-                width: "100%",
-                fontSize: 14,
-                borderCollapse: "collapse",
-              }}
-            >
-              <thead>
-                <tr>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      borderBottom: "1px solid #ccc",
-                    }}
-                  >
-                    ID
-                  </th>
-                  <th
-                    style={{
-                      textAlign: "left",
-                      borderBottom: "1px solid #ccc",
-                    }}
-                  >
-                    Tên danh mục
-                  </th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((cat) => (
-                  <tr key={cat.id}>
-                    <td style={{ padding: "4px 8px" }}>{cat.id}</td>
-                    <td style={{ padding: "4px 8px" }}>{cat.name}</td>
-                    <td>
-                      <button
-                        style={{
-                          background: "#e74c3c",
-                          color: "#fff",
-                          border: "none",
-                          borderRadius: 4,
-                          padding: "2px 8px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleDeleteCategory(cat.id)}
-                      >
-                        Xóa
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {/* Thêm danh mục */}
-            <div style={{ marginTop: 24 }}>
-              <h4>Thêm danh mục mới</h4>
-              <form onSubmit={handleAddCategory}>
-                <input
-                  type="text"
-                  placeholder="Tên danh mục"
-                  value={newCategory.name}
-                  onChange={(e) =>
-                    setNewCategory((prev) => ({
-                      ...prev,
-                      name: e.target.value,
-                    }))
-                  }
-                  style={{ width: "100%", marginBottom: 8, padding: 4 }}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Mô tả"
-                  value={newCategory.description}
-                  onChange={(e) =>
-                    setNewCategory((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  style={{ width: "100%", marginBottom: 8, padding: 4 }}
-                />
-                <button
-                  type="submit"
-                  style={{
-                    background: "#2575fc",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 4,
-                    padding: "6px 16px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Thêm danh mục
-                </button>
-              </form>
-              {catMsg && (
-                <div
-                  style={{
-                    color: catMsg.includes("thành công") ? "green" : "red",
-                    marginTop: 8,
-                  }}
-                >
-                  {catMsg}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
