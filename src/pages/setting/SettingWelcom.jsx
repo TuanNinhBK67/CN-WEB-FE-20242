@@ -18,7 +18,7 @@ const SettingWelcome = () => {
                     <li>Thông tin cá nhân <CgProfile/> </li>
                     <li>Cập nhật thông tin <GrUpdate/></li>
                     {user?.role === "customer" && (
-                        <li>Giỏ hàng <MdProductionQuantityLimits/></li>
+                        <li>Theo dõi đơn hàng <MdProductionQuantityLimits/></li>
                     )}
                     {
                         user?.role === "admin" && (
