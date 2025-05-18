@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "../assets/scss/header.scss";
 import {
     FaBell,
@@ -12,16 +13,32 @@ import {
 import { IoSettings, IoLogOutOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
 import CartPopup from "../pages/cart/CartPopup";
+import OrderForm from "../pages/order/components/OrderForm"
+import { getCart, updateCartItem, deleteCartItem, createOrder } from "../services/cartService";
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 const Header = () => {
     const [user, setUser] = useState(null);
-    const location = useLocation();
     const navigate = useNavigate();
     const [isOpenCart, setIsOpenCart] = useState(false);
-    const [cartItems, setCartItems] = useState([
-        { id: 1, name: "Áo thun", price: 150000, quantity: 2 },
-        { id: 2, name: "Quần jeans", price: 300000, quantity: 1 },
-    ]);
+    const [cartItems, setCartItems] = useState([]);
+	const [showOrderForm, setShowOrderForm] = useState(false);
+    const [orderSuccess, setOrderSuccess] = useState("");
+
+    const fetchCart = async () => {
+        try {
+            const response = await getCart();
+            setCartItems(response.data);
+            console.log(cartItems);
+        } catch (err) {
+            console.error("Lỗi khi lấy giỏ hàng:", err);
+        } finally {
+        }
+    };
+    useEffect(() => {
+        fetchCart();
+    }, [isOpenCart]);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -39,27 +56,42 @@ const Header = () => {
 
     const openCart = () => {
         // navigate("/cart", { state: { background: location } });
+		setShowOrderForm(false)
         setIsOpenCart(true);
-    };	
-
-    const handleRemove = (id) => {
-        setCartItems(cartItems.filter((item) => item.id !== id));
     };
 
-    const handleQuantityChange = (id, quantity) => {
-        setCartItems(
-            cartItems.map((item) =>
-                item.id === id ? { ...item, quantity } : item
-            )
-        );
+    const handleRemove = async (product_id) => {
+        try {
+            await deleteCartItem(product_id)
+            fetchCart();
+        } catch (err) {
+            console.error("Lỗi khi xoá sản phẩm:", err);
+        }
+    };
+
+    const handleQuantityChange = async (product_id, newQuantity) => {
+        try {
+            await updateCartItem(product_id, newQuantity);
+            fetchCart();
+        } catch (err) {
+            console.error("Lỗi khi cập nhật số lượng:", err);
+        }
     };
 
     const handleCheckout = () => {
         alert("Chuyển đến trang thanh toán");
     };
 
-    const handleOrder = () => {
-        alert("Đặt hàng thành công!");
+    const handleOrder = async () => {
+		setShowOrderForm(true)
+		setIsOpenCart(false);
+        // try {
+        //     const res = await createOrder()
+        //     alert("Đặt hàng thành công!");
+        //     fetchCart();
+        // } catch (err) {
+        //     console.error("Lỗi khi đặt hàng:", err);
+        // }
     };
 
     return (
@@ -157,14 +189,20 @@ const Header = () => {
 
             {isOpenCart && (
                 <CartPopup
-                    items={cartItems}   
+                    items={cartItems}
                     onClose={() => setIsOpenCart(false)}
                     onRemove={handleRemove}
                     onQuantityChange={handleQuantityChange}
                     onCheckout={handleCheckout}
                     onOrder={handleOrder}
                 />
-            )}           
+            )}
+
+			{showOrderForm && (
+				<OrderForm></OrderForm>
+			)
+
+			}
         </header>
     );
 };
