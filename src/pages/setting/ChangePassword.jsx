@@ -11,16 +11,22 @@ const Changepassword = () => {
     });
 
     const [err, setErr] = useState("");
+    const [showConfirmPopup, setShowConfirmPopup] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         const {name, value} = e.target;
         setFormData((prev) => ({...prev, [name]: value}));
     }
-
-    const handleSubmit = async(e) => {
+    
+    const handleConfirm = (e) => {
         e.preventDefault();
         setErr("");
+        setShowConfirmPopup(true);
+    };
+
+    const handleSubmitConfirmed = async(e) => {
+        setShowConfirmPopup(false);
         
         try{
             const res = await changePassword(formData);
@@ -38,7 +44,7 @@ const Changepassword = () => {
     return(
         <div className="change-password-wrapper">
             <h2>Đổi mật khẩu</h2>
-            <form className="change-password-form" onSubmit={handleSubmit}>
+            <form className="change-password-form" onSubmit={handleConfirm}>
                 {err && <p className="error-msg">{err}</p>}
 
                 <label>Mật khẩu hiện tại:</label>
@@ -70,6 +76,7 @@ const Changepassword = () => {
 
                 <div className="button-group">
                     <button 
+                    type="button"
                     className="cancel-button"
                     onClick={() => navigate("/")}>
                         Hủy
@@ -77,6 +84,17 @@ const Changepassword = () => {
                     <button type="submit">Xác nhận</button>
                 </div>
             </form>
+            {showConfirmPopup && (
+            <div className="popup-confirm-overlay">
+                <div className="popup-confirm">
+                <p>Bạn có chắc chắn muốn đổi mật khẩu không?</p>
+                <div className="popup-buttons">
+                    <button onClick={() => setShowConfirmPopup(false)}>Hủy</button>
+                    <button onClick={handleSubmitConfirmed}>Xác nhận</button>
+                </div>
+                </div>
+            </div>
+            )}
         </div>
     )
 }

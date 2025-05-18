@@ -12,6 +12,7 @@ const ForgotPassword = () => {
         e.preventDefault();
         try{
             const res = await forgotPassword(email);
+            console.log("API Response:", res.data);
             setMsg(res.data.errMessage);
             if(res.data.errCode === 0){
                 setshowPopup(true);
@@ -19,6 +20,7 @@ const ForgotPassword = () => {
             }
         }
         catch(err){
+            console.error("API Error:", err);
             setMsg("Đã có lỗi, vui lòng thử lại")
         }
     }
