@@ -26,14 +26,14 @@ const PaymentSuccess = () => {
         }
 
         // Bước 1: Lấy thông tin đơn hàng để có transaction_id
-        const orderResponse = await axios.get(`/api/orders/${orderId}`);
+        const orderResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders/${orderId}`);
         if (!orderResponse.data.success) {
           throw new Error("Không thể tải thông tin đơn hàng");
         }
         const order = orderResponse.data.order;
 
         // Bước 2: Kiểm tra trạng thái thanh toán
-        const confirmResponse = await axios.get(`/api/payments/confirm?order_id=${orderId}&transaction_id=${order.transaction_id}`);
+        const confirmResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/confirm?order_id=${orderId}&transaction_id=${order.transaction_id}`);
         if (!confirmResponse.data.success) {
           message.error("Thanh toán chưa hoàn tất");
           navigate(`/payment/failed/${orderId}`);
@@ -44,7 +44,7 @@ const PaymentSuccess = () => {
         if (!order.invoice_id) {
           throw new Error("Không tìm thấy hóa đơn cho đơn hàng này");
         }
-        const invoiceResponse = await axios.get(`/api/invoices/${order.invoice_id}`);
+        const invoiceResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${order.invoice_id}`);
         if (!invoiceResponse.data.success) {
           throw new Error("Không thể tải thông tin hóa đơn");
         }
@@ -94,7 +94,7 @@ const PaymentSuccess = () => {
 
   const handleDownloadInvoice = async () => {
     try {
-      const response = await axios.get(`/api/invoices/${invoice.id}/download`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${invoice.id}/download`, {
         responseType: "blob",
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));

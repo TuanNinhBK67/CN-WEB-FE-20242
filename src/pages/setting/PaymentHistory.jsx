@@ -7,7 +7,7 @@ import "./PaymentHistory.scss";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import SettingBoard from "../../components/SettingBoard";
-
+const API_URL = process.env.REACT_APP_API_URL;
 const PaymentHistory = () => {
   const navigate = useNavigate();
   const [payments, setPayments] = useState([]);
@@ -32,7 +32,7 @@ const PaymentHistory = () => {
           return;
         }
 
-        const response = await axios.get("/api/payments");
+        const response = await axios.get(`${API_URL}/api/payments`);
         if (response.data.success) {
           const formattedPayments = response.data.payments.map((payment) => ({
             id: payment.id,
@@ -63,7 +63,7 @@ const PaymentHistory = () => {
     setInvoiceLoading(true);
     setInvoiceModalVisible(true);
     try {
-      const response = await axios.get(`/api/invoices/${invoiceId}`);
+      const response = await axios.get(`${API_URL}/api/invoices/${invoiceId}`);
       if (response.data.success) {
         setSelectedInvoice(response.data.invoice);
       } else {
@@ -79,7 +79,7 @@ const PaymentHistory = () => {
 
   const handleRetryPayment = async (orderId) => {
     try {
-      const response = await axios.get(`/api/payments/status/${orderId}`);
+      const response = await axios.get(`${API_URL}/api/payments/status/${orderId}`);
       if (response.data.success && response.data.status === "pending") {
         navigate(`/checkout/${orderId}`);
       } else {
@@ -93,7 +93,7 @@ const PaymentHistory = () => {
 
   const handleRequestRefund = async () => {
     try {
-      const response = await axios.post("/api/payments/refund", {
+      const response = await axios.post(`${API_URL}/api/payments/refund`, {
         order_id: selectedOrderId,
         reason: refundReason,
       });
@@ -105,7 +105,7 @@ const PaymentHistory = () => {
         const fetchPayments = async () => {
           setLoading(true);
           try {
-            const response = await axios.get("/api/payments");
+            const response = await axios.get(`${API_URL}/api/payments`);
             if (response.data.success) {
               const formattedPayments = response.data.payments.map((payment) => ({
                 id: payment.id,

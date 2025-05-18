@@ -25,6 +25,7 @@ import Checkout from "./pages/Checkout.jsx";
 import PaymentSuccess from "./pages/payment/PaymentSuccess.jsx";
 import PaymentFailed from "./pages/payment/PaymentFailed.jsx";
 import PaymentHistory from "./pages/setting/PaymentHistory.jsx";
+import OrderListing from "./pages/setting/OrderListing.jsx";
 
 function App() {
   return (
@@ -76,6 +77,7 @@ function App() {
         <Route path="dashboard/user" element={<DashboardUser />} />
         <Route path="password" element={<Changepassword />} />
         <Route path="payments" element={<PaymentHistory />} />
+        <Route path="order-listing" element={<OrderListing />} />
         <Route path="dashboard/product" element={<ManageProduct />} />
         <Route path="addProduct" element={<AddProduct />} />
         <Route path="add-category" element={<AddCategory />} />
@@ -90,6 +92,7 @@ function App() {
       <Route path="/product/:id" element={<ProductResults key={window.location.pathname} />} />
       <Route path="/search" element={<ProductResults />} />
       <Route path="/category/:categoryId" element={<ProductResults />} />
+      <Route path="/products/branch/:branchId" element={<ProductResults />} />
       <Route path="/addProduct" element={<AddProduct />} />
       <Route path="/setting/change-product/:id" element={<ChangeProductInfo />} />
     </Routes>

@@ -32,13 +32,15 @@ const PaymentFailed = () => {
           return;
         }
 
-        const response = await axios.get(`/api/payments/status/${orderId}`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/api/payments/status/${orderId}`
+        );
+
         if (response.data.success) {
           setPaymentInfo(response.data);
           const paymentStatus = response.data.payment_status?.toLowerCase();
           const orderStatus = response.data.order_status?.toLowerCase();
 
-          // Không cho phép thử lại nếu đơn hàng đã hoàn thành hoặc đã thanh toán
           if (
             orderStatus === "completed" ||
             paymentStatus === "completed" ||
@@ -62,7 +64,10 @@ const PaymentFailed = () => {
 
   const handleTryAgain = async () => {
     try {
-      const response = await axios.get(`/api/payments/status/${orderId}`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/payments/status/${orderId}`
+      );
+
       if (response.data.success) {
         const paymentStatus = response.data.payment_status?.toLowerCase();
         const orderStatus = response.data.order_status?.toLowerCase();

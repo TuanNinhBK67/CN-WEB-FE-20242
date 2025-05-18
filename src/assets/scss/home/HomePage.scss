@@ -1,0 +1,147 @@
+.homepage {
+  display: flex;
+  gap: 24px;
+  min-height: 600px;
+  flex: 1;
+  background: #fff;
+  padding-top: 32px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  justify-items: center;
+  align-items: stretch;
+  min-height: 260px;
+  width: 100%;
+}
+
+.product-card,
+.sale-product-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 16px #e0e0e0;
+  width: 100%;
+  max-width: 370px;
+  min-height: 220px;
+  margin-bottom: 24px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 2, 0.6, 1), box-shadow 0.2s;
+  border: none;
+}
+.product-card:hover,
+.sale-product-card:hover {
+  transform: scale(1.07);
+  box-shadow: 0 8px 32px #bdbdbd;
+}
+
+.product-image {
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.product-info {
+  padding: 18px 20px 16px 20px;
+}
+
+.product-title {
+  color: #6c2eb7;
+  font-weight: 700;
+  font-size: 20px;
+  margin: 12px 0 4px;
+  line-height: 1.2;
+  min-height: 48px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-price {
+  font-size: 18px;
+  color: #e53935;
+  font-weight: 700;
+}
+.price-original {
+  text-decoration: line-through;
+  color: #888;
+  font-size: 15px;
+  margin-right: 10px;
+}
+.price-discounted {
+  color: #e53935;
+  font-weight: 700;
+}
+
+aside {
+  min-width: 260px;
+  background: #fafbfc;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px #eee;
+  height: fit-content;
+  color: #222;
+}
+
+aside h3 {
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
+  color: #222;
+}
+
+aside button {
+  display: block;
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 10px 0;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  color: #222;
+  font-weight: 500;
+}
+
+aside button.selected,
+aside button:active {
+  background: #e3e6f3;
+  border: 2px solid #2575fc;
+}
+
+aside button:not(.selected) {
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+aside button.remove-filter {
+  margin-top: 8px;
+  background: #fff;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  color: #2575fc;
+  font-weight: 600;
+  padding: 8px 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .homepage {
+    flex-direction: column;
+    gap: 0;
+    padding-top: 16px;
+  }
+  aside {
+    min-width: unset;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
