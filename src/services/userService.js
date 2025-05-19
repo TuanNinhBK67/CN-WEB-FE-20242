@@ -121,3 +121,7 @@ export const getUserById = async (id) => {
         params: { id: id },
     });
 };
+
+export const getShipper = async () => {
+    return axios.get(`${API_URL}/getAllShipper`);
+}

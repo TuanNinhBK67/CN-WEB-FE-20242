@@ -1,18 +1,39 @@
 import React, { useState, useEffect } from "react";
 import orderService from "../../services/orderService";
-import { getUserById } from "../../services/userService";
-
+import { getUserById, getShipper } from "../../services/userService";
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);
     const user = JSON.parse(localStorage.getItem("user"));
     const [searchTerm, setSearchTerm] = useState("");
+    const statusOptions = [
+        { label: "Chờ giao", value: "pending" },
+        { label: "Đang giao", value: "processing" },
+        { label: "Đã giao", value: "completed" },
+        { label: "Huỷ", value: "canceled" },
+        { label: "Đã thanh toán", value: "paid" }, // nếu có
+    ];
+    const [shippers, setShippers] = useState([]);
+    const [selectedShipperId, setSelectedShipperId] = useState(null);
+
+    useEffect(() => {
+        async function fetchShippers() {
+            try {
+                const res = await getShipper();
+                setShippers(res.data);
+                console.log(shippers);
+            } catch (error) {
+                console.error("Lỗi lấy danh sách shipper:", error);
+            }
+        }
+        fetchShippers();
+    }, []);
 
     useEffect(() => {
         async function fetchOrdersWithUserProfile() {
             try {
                 let response;
-                if (user.role == "customer"){
+                if (user.role == "customer") {
                     response = await orderService.getAllOrders();
                 } else {
                     response = await orderService.getAllOrders_admin();
@@ -39,22 +60,28 @@ const OrderManagement = () => {
         fetchOrdersWithUserProfile();
     }, []);
 
-    const handleStatusChange = (id, newStatus) => {
-        setOrders((prev) =>
-            prev.map((order) =>
-                order.id === id ? { ...order, status: newStatus } : order
-            )
-        );
-    };
-
-    const handleAssignShipper = async (id) => {
-        const name = prompt("Nhập tên shipper:");
-        if (name) {
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            await orderService.updateOrderStatus(id, newStatus); // Gọi API
             setOrders((prev) =>
                 prev.map((order) =>
-                    order.id === id ? { ...order, shipper: name } : order
+                    order.id === id ? { ...order, status: newStatus } : order
                 )
             );
+            alert("Cập nhật trạng thái thành công!");
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái:", error);
+            alert("Không thể cập nhật trạng thái.");
+        }
+    };
+
+    const handleAssignShipper = async (orderId, shipperId) => {
+        try {
+            await orderService.assignShipper(orderId, shipperId);
+            alert("gán shipper");
+        } catch (error) {
+            console.error("Lỗi khi gán shipper:", error);
+            alert("Không thể gán shipper.");
         }
     };
 
@@ -144,50 +171,81 @@ const OrderManagement = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4">
-                                    {order.shipper || "---"}
+                                    {order.shipper.full_name || "---"}
                                 </td>
                                 <td className="py-3 px-4 space-y-1">
-                                    {/* các button và select như cũ */}
-                                    <div className="flex flex-wrap gap-2">
-                                        <button
-                                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded"
-                                            onClick={() =>
-                                                handleAssignShipper(order.id)
-                                            }
-                                        >
-                                            Gán shipper
-                                        </button>
-                                        <button
-                                            className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded"
-                                            onClick={() =>
-                                                handleCancelOrder(order.id)
-                                            }
-                                        >
-                                            Huỷ
-                                        </button>
-                                        <button
-                                            className="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-2 py-1 rounded"
-                                            onClick={() =>
-                                                handleFailOrder(order.id)
-                                            }
-                                        >
-                                            Thất bại
-                                        </button>
-                                        <select
-                                            className="border px-2 py-1 rounded text-xs"
-                                            value={order.status}
-                                            onChange={(e) =>
-                                                handleStatusChange(
-                                                    order.id,
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option>Chờ giao</option>
-                                            <option>Đang giao</option>
-                                            <option>Đã giao</option>
-                                        </select>
-                                    </div>
+                                    {user.role === "admin" && (
+                                        <div className="flex flex-wrap gap-2">
+                                            <select
+                                                className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-2 py-1 rounded"
+                                                value={order.shipper || ""} // set giá trị hiện tại của shipper cho từng đơn
+                                                onChange={async (e) => {
+                                                    const shipperId =
+                                                        e.target.value;
+                                                    try {
+                                                        await handleAssignShipper(
+                                                            order.id,
+                                                            shipperId
+                                                        );
+                                                    } catch (error) {
+                                                        // lỗi đã xử lý trong handleAssignShipper
+                                                    }
+                                                }}
+                                            >
+                                                <option value="" disabled>
+                                                    Gán shipper
+                                                </option>
+                                                {(shippers || []).map(
+                                                    (shipper) => (
+                                                        <option
+                                                            key={shipper.id}
+                                                            value={shipper.id}
+                                                        >
+                                                            {shipper.username} -{" "}
+                                                            {
+                                                                shipper.phone_number
+                                                            }
+                                                        </option>
+                                                    )
+                                                )}
+                                            </select>
+                                            <button
+                                                className="bg-yellow-500 hover:bg-yellow-600 text-white text-xs px-2 py-1 rounded"
+                                                onClick={() =>
+                                                    handleFailOrder(order.id)
+                                                }
+                                            >
+                                                Thất bại
+                                            </button>
+                                            <select
+                                                className="border px-2 py-1 rounded text-xs"
+                                                value={order.status}
+                                                onChange={(e) =>
+                                                    handleStatusChange(
+                                                        order.id,
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                {statusOptions.map((opt) => (
+                                                    <option
+                                                        key={opt.value}
+                                                        value={opt.value}
+                                                    >
+                                                        {opt.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <button
+                                                className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded"
+                                                onClick={() =>
+                                                    handleCancelOrder(order.id)
+                                                }
+                                            >
+                                                Huỷ
+                                            </button>
+                                        </div>
+                                    )}
                                 </td>
                             </tr>
                         ))}
