@@ -7,7 +7,7 @@ export const handleSearch = async (
     setSearchKeyword(keyword);
     try {
         const response = await fetch(
-            `http://localhost:8080/api/products/search?keyword=${encodeURIComponent(
+            `${process.env.REACT_APP_API_URL}/api/products/search?keyword=${encodeURIComponent(
                 keyword
             )}`
         );
