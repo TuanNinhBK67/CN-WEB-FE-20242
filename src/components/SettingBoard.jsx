@@ -46,7 +46,7 @@ const SidebarMenu = () => {
             {user?.role === "shipper" && (
                 <li
                 className={location.pathname === "/setting/order" ? "active" : ""} 
-                onClick={() => navigate("/setting/order")}>Danh sách đơn hàng</li>
+                onClick={() => navigate("/setting/dashboard/orders")}>Danh sách đơn hàng</li>
             )}
             <li
             className={location.pathname === "/setting/password" ? "active" : ""}  

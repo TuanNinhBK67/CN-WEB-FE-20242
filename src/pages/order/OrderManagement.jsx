@@ -14,7 +14,6 @@ const OrderManagement = () => {
         { label: "Đã thanh toán", value: "paid" }, // nếu có
     ];
     const [shippers, setShippers] = useState([]);
-    const [selectedShipperId, setSelectedShipperId] = useState(null);
 
     useEffect(() => {
         async function fetchShippers() {
@@ -35,8 +34,10 @@ const OrderManagement = () => {
                 let response;
                 if (user.role == "customer") {
                     response = await orderService.getAllOrders();
-                } else {
+                } else if(user.role == "admin") { 
                     response = await orderService.getAllOrders_admin();
+                } else {
+                    response = await orderService.getAllOrderShipper();
                 }
                 const ordersData = response.data;
                 const ordersWithProfile = await Promise.all(
@@ -78,7 +79,7 @@ const OrderManagement = () => {
     const handleAssignShipper = async (orderId, shipperId) => {
         try {
             await orderService.assignShipper(orderId, shipperId);
-            alert("gán shipper");
+            alert("gán shipper thành công");
         } catch (error) {
             console.error("Lỗi khi gán shipper:", error);
             alert("Không thể gán shipper.");
@@ -171,7 +172,7 @@ const OrderManagement = () => {
                                     </span>
                                 </td>
                                 <td className="py-3 px-4">
-                                    {order.shipper.full_name || "---"}
+                                    {order.shipper?.full_name || "---"}
                                 </td>
                                 <td className="py-3 px-4 space-y-1">
                                     {user.role === "admin" && (
@@ -244,6 +245,29 @@ const OrderManagement = () => {
                                             >
                                                 Huỷ
                                             </button>
+                                        </div>
+                                    )}
+                                    {user.role === "shipper" && (
+                                        <div className="flex flex-wrap gap-2">
+                                            <select
+                                                className="border px-2 py-1 rounded text-xs"
+                                                value={order.status}
+                                                onChange={(e) =>
+                                                    handleStatusChange(
+                                                        order.id,
+                                                        e.target.value
+                                                    )
+                                                }
+                                            >
+                                                {statusOptions.map((opt) => (
+                                                    <option
+                                                        key={opt.value}
+                                                        value={opt.value}
+                                                    >
+                                                        {opt.label}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     )}
                                 </td>

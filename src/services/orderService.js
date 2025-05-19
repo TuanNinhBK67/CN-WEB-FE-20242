@@ -19,6 +19,11 @@ const orderService = {
         return axios.get(`${API_URL}/${user_id}`);
     },
 
+    getAllOrderShipper: () => {
+        const user_id = getUserId()
+        return axios.get(`${API_URL}/shipper/${user_id}`);
+    },
+
     // Lấy chi tiết đơn hàng theo ID
     getOrderById: (orderId) => {
         return axios.get(`${API_URL}/${orderId}`);
