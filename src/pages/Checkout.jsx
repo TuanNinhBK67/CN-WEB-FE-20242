@@ -1,13 +1,14 @@
 // /checkout/:orderId?
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { message } from "antd";
+import { message, Modal } from "antd";
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import "./Checkout.scss";
 import { FaCreditCard, FaPaypal } from "react-icons/fa";
 // import { SiMomo, SiVnpay } from "react-icons/si";
 import axios from "axios";
+
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -95,20 +96,20 @@ useEffect(() => {
   typeofUserId: typeof String(user.id),
 });
 
-
+/*
       const createResponse = await axios.post(
   `${process.env.REACT_APP_API_URL}/api/payments/create`,
   {
     order_id: order.id,
     user_id: String(user.id), // đảm bảo đúng kiểu string
-    amount: parseFloat(order.total), // đảm bảo đúng kiểu number
+    amount: parseInt(order.total), // đảm bảo đúng kiểu number
     payment_method: paymentMethod,
   }
 );
       if (!createResponse.data.success) {
         throw new Error("Không thể tạo giao dịch thanh toán");
       }
-
+*/
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/payments/process`,
         {
@@ -143,7 +144,8 @@ useEffect(() => {
       );
       if (response.data.success) {
         message.success("Đã hủy thanh toán thành công");
-        navigate("/setting/orders");
+        navigate("/setting/order-listing");
+        
       } else {
         message.error("Không thể hủy thanh toán");
       }
@@ -210,7 +212,7 @@ useEffect(() => {
             <div className="shipping-address">
               <h3>Địa chỉ giao hàng</h3>
               <p>{order.address}</p>
-              <button className="change-address-btn">Thay đổi</button>
+              
             </div>
           </div>
 

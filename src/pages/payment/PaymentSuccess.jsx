@@ -1,4 +1,3 @@
-// /payment/success/:orderId
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { message } from "antd";
@@ -18,54 +17,63 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const fetchInvoiceData = async () => {
       try {
+        console.log("Start fetching invoice data for orderId:", orderId);
         setLoading(true);
+
         const user = JSON.parse(localStorage.getItem("user"));
+        console.log("User from localStorage:", user);
         if (!user) {
           message.error("Vui lòng đăng nhập để xem thông tin hóa đơn");
           navigate("/login");
           return;
         }
 
-        // Bước 1: Lấy thông tin đơn hàng để có transaction_id
-        const orderResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders/${orderId}`);
-        if (!orderResponse.data.success) {
-          throw new Error("Không thể tải thông tin đơn hàng");
-        }
-        const order = orderResponse.data.order;
+        const paymentResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/filter?order_id=${orderId}&payment_status=paid`);
+        console.log("Payment response:", paymentResponse.data);
 
-        // Bước 2: Kiểm tra trạng thái thanh toán
-        const confirmResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/confirm?order_id=${orderId}&transaction_id=${order.transaction_id}`);
+        if (!paymentResponse.data.success || !paymentResponse.data.payment) {
+          throw new Error("Không thể tìm thấy thanh toán cho đơn hàng");
+        }
+        const payment = paymentResponse.data.payment;
+
+        const confirmResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/confirm?order_id=${orderId}&transaction_id=${payment.transaction_id}`);
+        console.log("Confirm response:", confirmResponse.data);
+
         if (!confirmResponse.data.success) {
           message.error("Thanh toán chưa hoàn tất");
           navigate(`/payment/failed/${orderId}`);
           return;
         }
 
-        // Bước 3: Lấy thông tin hóa đơn
-        if (!order.invoice_id) {
+        const order = payment.order;
+        console.log("Order from payment:", order);
+
+        const invoiceResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/payments/invoices?order_id=${order.id}`);
+        console.log("Invoice response:", invoiceResponse.data);
+
+        if (!invoiceResponse.data.success || !invoiceResponse.data.invoice) {
           throw new Error("Không tìm thấy hóa đơn cho đơn hàng này");
         }
-        const invoiceResponse = await axios.get(`${process.env.REACT_APP_API_URL}/api/invoices/${order.invoice_id}`);
-        if (!invoiceResponse.data.success) {
-          throw new Error("Không thể tải thông tin hóa đơn");
-        }
+
         const invoiceData = invoiceResponse.data.invoice;
 
-        // Ánh xạ dữ liệu API sang định dạng giao diện
-        setInvoice({
+        const mappedInvoice = {
           id: invoiceData.id,
           orderNumber: order.id || "N/A",
           transactionId: order.transaction_id || "N/A",
           date: new Date(invoiceData.created_at || invoiceData.createdAt).toLocaleDateString("vi-VN"),
           paymentMethod: getPaymentMethodLabel(order.payment_method || "N/A"),
-          items: invoiceData.items || [],
           subtotal: parseFloat(invoiceData.total_amount) - (order.shipping_fee || 0),
           shippingFee: order.shipping_fee || 0,
           total: parseFloat(invoiceData.total_amount || 0),
           customerName: invoiceData.user?.full_name || "N/A",
           shippingAddress: order.shipping_address || "N/A",
-        });
+        };
+        console.log("Mapped invoice data:", mappedInvoice);
+
+        setInvoice(mappedInvoice);
         setLoading(false);
+        console.log("Finished fetching invoice data successfully");
       } catch (error) {
         console.error("Lỗi khi tải hóa đơn:", error);
         setError(error.message || "Đã xảy ra lỗi khi tải thông tin hóa đơn");
@@ -152,9 +160,7 @@ const PaymentSuccess = () => {
           <FaCheckCircle className="success-icon" />
           <h1>Thanh toán thành công!</h1>
           <p>
-            Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được xác nhận và đang
-            được xử lý.
- Discovering additional properties in the invoice object
+            Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được xác nhận và đang được xử lý.
           </p>
         </div>
 
@@ -182,30 +188,6 @@ const PaymentSuccess = () => {
             </div>
           </div>
 
-          <div className="invoice-items">
-            <h3>Chi tiết sản phẩm</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Sản phẩm</th>
-                  <th>Số lượng</th>
-                  <th>Đơn giá</th>
-                  <th>Thành tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.items.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.name}</td>
-                    <td>{item.quantity}</td>
-                    <td>{Number(item.price).toLocaleString("vi-VN")} ₫</td>
-                    <td>{(Number(item.price) * item.quantity).toLocaleString("vi-VN")} ₫</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
           <div className="invoice-summary">
             <div className="summary-row">
               <span>Tạm tính:</span>
@@ -231,7 +213,7 @@ const PaymentSuccess = () => {
           </button>
           <button
             className="secondary-button"
-            onClick={() => navigate("/setting/orders")}
+            onClick={() => navigate("/setting/order-listing")}
           >
             <FaShoppingBag /> Xem đơn hàng
           </button>
