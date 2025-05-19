@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL + "/api/orders"; // Thay bằng URL thực tế của backend
+const API_URL = `${process.env.REACT_APP_API_URL}/api/orders`; // Thay bằng URL thực tế của backend
 
 const getUserId = () => {
     const user = JSON.parse(localStorage.getItem("user"));

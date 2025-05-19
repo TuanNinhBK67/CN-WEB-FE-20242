@@ -85,7 +85,7 @@ const Header = () => {
 
   const handleCheckout = () => {
     alert("Chuyển đến trang thanh toán");
-    navigate('/order-listing');
+    navigate("/setting/order-listing");
   };
 
   const handleOrder = async () => {
@@ -143,11 +143,11 @@ const Header = () => {
                 <FaUserCircle /> Xin chào {user.username}
               </span>
 
-              {user.role === "customer" && (
+              {/* {user.role === "customer" && (
                 <a href="/cart">
                   <FaShoppingCart /> Giỏ hàng
                 </a>
-              )}
+              )} */}
               <a href="/setting">
                 <IoSettings />
                 Cài đặt

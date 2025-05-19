@@ -1,12 +1,14 @@
+// /checkout/:orderId?
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { message } from "antd";
+import { message, Modal } from "antd";
 import Header from '../components/Header.jsx';
 import Footer from '../components/Footer.jsx';
 import "./Checkout.scss";
 import { FaCreditCard, FaPaypal } from "react-icons/fa";
 // import { SiMomo, SiVnpay } from "react-icons/si";
 import axios from "axios";
+
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -21,26 +23,52 @@ const Checkout = () => {
   });
   const { orderId } = useParams();
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        if (!user) {
-          navigate("/login");
-          return;
-        }
-
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL}/api/orders/${orderId}`
-        );
-        setOrder(response.data);
-      } catch (error) {
-        console.error("Error fetching order:", error);
+useEffect(() => {
+  const fetchOrder = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user) {
+        navigate("/login");
+        return;
       }
-    };
 
-    fetchOrder();
-  }, [orderId, navigate]);
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/api/orders/${user.id}`
+      );
+
+      // Tìm đơn hàng có đúng orderId
+      const matchedOrder = response.data.find(
+        (order) => order.id === parseInt(orderId)
+      );
+
+      if (!matchedOrder) {
+        message.error("Không tìm thấy đơn hàng");
+        navigate("/setting/orders");
+        return;
+      }
+
+      // Chuẩn hóa dữ liệu để giao diện sử dụng được
+      const processedOrder = {
+        id: matchedOrder.id,
+        total: matchedOrder.total_amount,
+        shippingFee: 0, // hoặc xử lý nếu có field riêng
+        address: matchedOrder.shipping_address,
+        items: matchedOrder.orderdetails.map((item) => ({
+          name: `Sản phẩm #${item.product_id}`, // có thể thay bằng tên thực nếu trả về
+          quantity: item.quantity,
+          price: parseFloat(item.price),
+        })),
+      };
+
+      setOrder(processedOrder);
+    } catch (error) {
+      console.error("Error fetching order:", error);
+    }
+  };
+
+  fetchOrder();
+}, [orderId, navigate]);
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -60,20 +88,28 @@ const Checkout = () => {
 
     try {
       const user = JSON.parse(localStorage.getItem("user"));
+      console.log("Gửi payment với:", {
+  order_id: order.id,
+  user_id: String(user.id),
+  amount: parseFloat(order.total),
+  typeofAmount: typeof parseFloat(order.total),
+  typeofUserId: typeof String(user.id),
+});
 
+/*
       const createResponse = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/payments/create`,
-        {
-          order_id: order.id,
-          user_id: user.id,
-          amount: order.total,
-          payment_method: paymentMethod,
-        }
-      );
+  `${process.env.REACT_APP_API_URL}/api/payments/create`,
+  {
+    order_id: order.id,
+    user_id: String(user.id), // đảm bảo đúng kiểu string
+    amount: parseInt(order.total), // đảm bảo đúng kiểu number
+    payment_method: paymentMethod,
+  }
+);
       if (!createResponse.data.success) {
         throw new Error("Không thể tạo giao dịch thanh toán");
       }
-
+*/
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/api/payments/process`,
         {
@@ -108,7 +144,8 @@ const Checkout = () => {
       );
       if (response.data.success) {
         message.success("Đã hủy thanh toán thành công");
-        navigate("/setting/orders");
+        navigate("/setting/order-listing");
+        
       } else {
         message.error("Không thể hủy thanh toán");
       }
@@ -175,7 +212,7 @@ const Checkout = () => {
             <div className="shipping-address">
               <h3>Địa chỉ giao hàng</h3>
               <p>{order.address}</p>
-              <button className="change-address-btn">Thay đổi</button>
+              
             </div>
           </div>
 
